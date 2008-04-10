@@ -1,0 +1,36 @@
+#summary The planned development of Plotter. Is subject to frequent reconsideration and change.
+#labels Phase-Design
+
+=  Development Iterations=
+
+  * 1.  *Dates / Locations / Organizer*
+    * database
+    * webservice
+    * browser-interface - reading
+    * django-admin interface
+    * json
+    * commenting
+
+  * 1.5  *Geo*
+    * map-view
+    * geo-search
+
+  * 2. *Regulars*
+    * browser-interface - writing
+
+  * 3. *Events*
+    * grouping dates
+    * dates relates to evetns via many-to-many?  
+ 
+  * 4. *Webresources*
+    * Adding additional value to dates/location by linking it up with resources from the web.
+
+  * 5. *Community 1*
+    * User-Login
+    * Invites?
+    * Community-Features (attending/ride-sharing/guest-list)
+
+  * 6. *Community 2*
+    * users manage their own dates
+
+  * 7.
