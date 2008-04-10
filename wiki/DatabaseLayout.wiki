@@ -1,0 +1,15 @@
+#summary Overview over the database layout.
+#labels Featured
+
+Termindatenbank. 
+
+Main tables in early iteration:
+    * *Date* - Ein Termin.
+    * *Location* - Ein Ort an dem Termine stattfinden können.
+    * *Organizer* - Eine Person/Gruppe, die Termine veranstaltet.
+    * *Adress* - Eine Adresse und/oder Geo-location
+
+Additional tables in a later iteration:
+    * *Regular* - Eine Regel für sich wiederholende Termine. 
+    * *Event* - Eine Zusammenfassung von Terminen.
+
