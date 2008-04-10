@@ -1,0 +1,29 @@
+#summary URLs exposed by the Plotter-Webservice.
+#labels Phase-Design
+
+= Example URLs =
+
+A list of URLs that the Webservice will expose. Every URLwill have a json-representation (will it?) and most of them will also return text/html.
+
+  * /dates/[time]/[place]/
+
+  * /dates/today/?cat=2,3,11,4   - all dates today with the categories 2,3,4 and 11
+  * /dates/2008-06/de-50672/     - all dates in june 08 in germany zipcode 50672
+  * /dates/2008-06/de-50/        - all dates in june 08 in germany zipcode 50
+  * /dates/2008-06/koeln/        - all dates in june 08 in cologne, germay
+  * /dates/2008-06-14/           - all dates on 14th june 08 
+
+  * /dates/2008-06-14/domingo-club/    - one specific date
+
+  * /dates/today/1.231233,2.34234/walking/   - all dates today in walking distance of
+
+  * /locations/gebaeude9/                    - all (upcoming?) dates at one location 
+
+  * /events/2008/fantasy-filmfest-cologne/   - all dates belonging to a certain event
+  * /events/2008/                            - all events in 2008 
+
+
+Problem with this URL-Layout is that there is no possiblity of filtering for location without filtering for dates.
+
+Also problematic might be that _/dates/2008-06-14/domingo-club/_ doesnt contain location information. Not possible to differentiate two Domingo Clubs at the same day in two cities.
+
