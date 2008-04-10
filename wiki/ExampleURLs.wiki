@@ -5,7 +5,7 @@
 
 A list of URLs that the Webservice will expose. Every URLwill have a json-representation (will it?) and most of them will also return text/html.
 
-  * /dates/[time]/[place]/
+  * /dates/_time_/_place_/
 
   * /dates/today/?cat=2,3,11,4   - all dates today with the categories 2,3,4 and 11
   * /dates/2008-06/de-50672/     - all dates in june 08 in germany zipcode 50672
@@ -26,4 +26,3 @@ A list of URLs that the Webservice will expose. Every URLwill have a json-repres
 Problem with this URL-Layout is that there is no possiblity of filtering for location without filtering for dates.
 
 Also problematic might be that _/dates/2008-06-14/domingo-club/_ doesnt contain location information. Not possible to differentiate two Domingo Clubs at the same day in two cities.
-
