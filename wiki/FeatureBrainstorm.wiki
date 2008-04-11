@@ -1,0 +1,18 @@
+#summary A unordered list of possible future features.
+#labels Phase-Design
+
+= Feature Brainstorming=
+
+  * webinterface
+  * import from ical (google/outlook), hCalendar,  rss, ical, csv, email?
+  * export to ical
+  * interface with scial networks?  maybe possible via ical?
+  * mapping
+  * feeds per: location/area, organizer, area, owner  
+  * pdf-export for making plotter leaflets.
+  * (latex-export??)
+  * widget to include dates on personal websites
+  * Desktop widgets / NetVibes / igoogle  
+  * Usergroups / Permission-System
+  * mobile
+  * feedback/impressum/about/submit a date/...
