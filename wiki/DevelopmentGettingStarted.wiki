@@ -1,0 +1,24 @@
+#summary A short guide on how to install a development version.
+#labels Phase-Implementation
+
+=Getting Started=
+
+==Develompment Envireonment==
+
+To get going with the development of Plotter you need an installation of [http://www.djangoproject.com/ Django]. 
+
+Here is a small guide on how to get that running. In order to develop plotter no apache or mysql is needed.  The development server included with django and sqlite will do just fine.
+
+Assuming you got a version of Python >2.3 and an install of sqlite you just need to check out the current versions of django and of plotter.   
+
+Django installation shold go in a direcory below you python site-packages direcory. The easiest way to find this is to execute 
+
+{{{ python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" }}}
+on the commandline.
+
+cd into that directory
+{{{ mkdir django }}} 
+and  
+{{{ svn co http://code.djangoproject.com/svn/django/trunk/django/ django }}}
+
+to be continued...
