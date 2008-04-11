@@ -1,0 +1,22 @@
+{% extends "base.html" %} 
+
+{% block content %}
+<h1>{{object.name}}</h2>
+<div class="vevent">
+ <a class="url" href="http://www.web2con.com/">http://www.web2con.com/</a>
+  <span class="summary">{{object.summary}}</span>: 
+  <abbr class="dtstart" title="{{ object.startdate|date:"Y.m.d" }}">{{ object.startdate|date:"d.m.Y" }}</abbr>-
+  <abbr class="dtend"  title="{{ object.enddate|date:"Y.m.d" }}">{{ object.enddate|date:"d.m.Y" }}</abbr>,
+ at the <span class="location">{{ object.location }}</span>
+ </div>
+
+<div class="vevent">
+<h3 class="summary">{{ object.summary  }}</h3>
+<p class="description">{{ object.description  }}</p>
+<p>To be held on <abbr class="dtstart" title="{{ objects.startdatetime|date:"Y-m-d\Th:i:s"}}">{{ object.startdate|date:"d.m.Y" }} from {{ object.starttime|time:"H:i"  }}</abbr> 
+until <abbr class="dtend" title="{{ objects.enddate|date:"Y-m-d\TH:i:s"}}">{{ object.enddate|date:"H:i"}}</abbr></p>
+<p>Location: <span class="location">{{ object.location}}</span></p>
+<small>Booked by: <span class="uid">guid-1.host1.com</span> on 
+<abbr class="dtstamp" title="19980309T231000Z">9 Mar 1998 6:00pm</abbr></small>
+</div>
+{% endblock %}
