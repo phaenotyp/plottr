@@ -32,9 +32,11 @@ class DateManager(models.Manager):
 
     def oneday(self, startdate): 
         """returns a queryset with all dates on the passed datetimes day"""
-        d = datetime(startdate.year, startdate.month, startdate.day)
-        dplus1 = d + timedelta(days=+1, minutes=-1)
-        return self.published().filter(startdate__range=(d, dplus1)) 
+        return self.published().filter(
+              startdate__year=startdate.year,
+              startdate__month=startdate.month,
+              startdate__day=startdate.day
+                                      ) 
 
     def today(self): 
         """returns a queryset of all published dates today"""
