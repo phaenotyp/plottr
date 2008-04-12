@@ -81,6 +81,8 @@ class DateTestCase(unittest.TestCase):
         self.assertEquals(d.duration().seconds/60, 90, 'Duration of date is incorrect.') 
 
     def test_startdatetime(self):      
+        """There are separate fields for startdate and time. 
+           the method startdatetime() returns a datetime object combine startdate and time.""" 
         rox = Location.objects.create(name='Roxy')    
         rox.adress = Adress.objects.create(country='de', zipcode='53117') 
         day = datetime(2008, 5, 13, 20, 30) 
@@ -92,8 +94,25 @@ class DateTestCase(unittest.TestCase):
             location = rox) 
         self.assertEquals( str(d.startdatetime()), '2008-05-13 20:30:00' ) 
 
-       
-
+    def test_adress(self):
+        """The Adress of an event should always be accessable via date.adress, even if its the adress of the location."""   
+        day = datetime(2008, 5, 13, 20, 30) 
+        a = Adress.objects.create(street='Sesame',city='koeln',country='de')
+        d = Date.objects.create(
+            startdate = day,   
+            starttime = time(20,30), 
+            enddate = day+timedelta(minutes=90), 
+            summary = 'Sesame Club',
+            adress = a
+            ) 
+        self.assertEquals(d.adress.street, 'Sesame')
+        a2 = Adress.objects.create(street='Poppy',city='koeln',country='de')
+        rox = Location.objects.create(name='Roxy',adress=a2)    
+        d.location = rox
+        d.save()
+        self.assertEquals(d.adress.street, 'Poppy')
+        
+        
 
 class LocationTestCase(unittest.TestCase):
     def test_creation(self): 
