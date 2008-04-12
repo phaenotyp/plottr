@@ -1,4 +1,3 @@
--- Structure for the Tables for Dates as of April 12th 2008 
 BEGIN;
 CREATE TABLE "dates_date" (
     "id" integer NOT NULL PRIMARY KEY,
@@ -10,6 +9,7 @@ CREATE TABLE "dates_date" (
     "description" text NOT NULL,
     "organizer_id" integer NULL,
     "location_id" integer NULL,
+    "adress_id" integer NULL,
     "owner_id" integer NULL REFERENCES "auth_user" ("id"),
     "created" datetime NOT NULL,
     "modified" datetime NOT NULL,
@@ -45,6 +45,7 @@ CREATE TABLE "dates_location" (
 CREATE INDEX "dates_date_slug" ON "dates_date" ("slug");
 CREATE INDEX "dates_date_organizer_id" ON "dates_date" ("organizer_id");
 CREATE INDEX "dates_date_location_id" ON "dates_date" ("location_id");
+CREATE INDEX "dates_date_adress_id" ON "dates_date" ("adress_id");
 CREATE INDEX "dates_date_owner_id" ON "dates_date" ("owner_id");
 CREATE INDEX "dates_organizer_slug" ON "dates_organizer" ("slug");
 CREATE INDEX "dates_location_slug" ON "dates_location" ("slug");
