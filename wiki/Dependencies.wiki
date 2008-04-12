@@ -1,0 +1,8 @@
+#summary Python packages that need to be installed in order for Plotter to work correctly.
+#labels Phase-Deploy
+
+= Dependencies =
+
+Plotter uses some third-party Python packages. Make sure to have these on you system before running Plotter. 
+
+  * [http://exogen.case.edu/projects/geopy/ Geopy] A geocoding toolbox.
