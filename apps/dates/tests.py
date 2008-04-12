@@ -111,7 +111,9 @@ class DateTestCase(unittest.TestCase):
         d.location = rox
         d.save()
         self.assertEquals(d.adress.street, 'Poppy')
-        
+       
+        # TODO:  test is not finished.  
+        # test removing a location. 
         
 
 class LocationTestCase(unittest.TestCase):

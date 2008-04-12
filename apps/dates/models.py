@@ -44,11 +44,11 @@ class DateManager(models.Manager):
 
     def by_place( self, place ):  
         (country, zipcode) = place.split('-')  
-        return self.published().filter(location__adress__country__iexact=country, location__adress__zipcode__istartswith=zipcode)
+        return self.published().filter(adress__country__iexact=country, adress__zipcode__istartswith=zipcode)
 
     def by_date_and_place(self, date, place):
         (country, zipcode) = place.split('-')  
-        return self.by_date(date).filter(location__adress__country__iexact=country, location__adress__zipcode__istartswith=zipcode) 
+        return self.by_date(date).filter(adress__country__iexact=country, adress__zipcode__istartswith=zipcode) 
         
 
     def by_date(self, date):
@@ -173,6 +173,7 @@ class Date(models.Model):
     description  = models.TextField(blank=True)
     organizer    = models.ForeignKey(Organizer, blank=True, null=True) 
     location     = models.ForeignKey(Location, blank=True, null=True) 
+    adress       = models.ForeignKey(Adress, blank=True, null=True) 
    
     # technical fields
     owner = models.ForeignKey(User, blank=True, null=True)
@@ -226,6 +227,12 @@ class Date(models.Model):
 
     def save(self):
         """Saves the Location and takes care that there is a slug"""
+
+        # if the date has an adress the adress is redundantly saved in the
+        # date-model in oder to allow easy querying. 
+        if self.location and self.location.adress:
+            self.adress = self.location.adress
+
         if not self.slug:
            self.slug = slugify(self.summary) 
         super(Date, self).save()
