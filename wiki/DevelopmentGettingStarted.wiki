@@ -3,13 +3,15 @@
 
 =Getting Started=
 
-==Develompment Envireonment==
+==Development Environment==
 
 To get going with the development of Plotter you need an installation of [http://www.djangoproject.com/ Django]. 
 
 Here is a small guide on how to get that running. In order to develop plotter no apache or mysql is needed.  The development server included with django and sqlite will do just fine.
 
 Assuming you got a version of Python >2.3 and an install of sqlite you just need to check out the current versions of django and of plotter.   
+
+===Get Django===
 
 Django installation shold go in a direcory below you python site-packages direcory. The easiest way to find this is to execute 
 
@@ -21,4 +23,36 @@ cd into that directory
 and  
 {{{ svn co http://code.djangoproject.com/svn/django/trunk/django/ django }}}
 
-to be continued...
+===Get Plotter===
+
+Get the trunk version of plotter.
+
+{{{ svn checkout http://plottr.googlecode.com/svn/trunk/ plotter }}}
+
+===Get Going===
+There are a couple more things to do.
+   * You need to create a _local_settings.py_ file in your project-directory. It contains the information to access the local database and other deployment specific details. It could look like this:
+
+{{{
+DEBUG = True
+TEMPLATE_DEBUG = DEBUG
+DATABASE_ENGINE = "sqlite3"
+DATABASE_NAME = '/path/to/a/sqlite.db'
+
+
+google_api_key = 'your_google_api_key'
+
+ADMINS = (
+     ('name', 'email@example.com'),
+)
+
+MANAGERS = ADMINS
+}}} 
+
+  * Make sure you got all the packages mentioned in [Dependencies] on your System.
+
+  * Start the Development Server {{{ python ./manage.py runserver }}}.
+
+  * Point your browser to http://127.0.0.1:2701/ 
+
+
