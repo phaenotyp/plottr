@@ -1,5 +1,5 @@
 #summary A short guide on how to install a development version.
-#labels Phase-Implementation
+#labels Phase-Implementation,Featured
 
 =Getting Started=
 
@@ -54,5 +54,3 @@ MANAGERS = ADMINS
   * Start the Development Server {{{ python ./manage.py runserver }}}.
 
   * Point your browser to http://127.0.0.1:2701/ 
-
-
