@@ -2,6 +2,7 @@ import unittest
 from datetime import datetime, timedelta, time
 
 from plotter.apps.dates.models import Date, Location, Adress
+from plotter import settings
 
 class DateManagerTestCase(unittest.TestCase):
     def setUp(self): 
@@ -114,6 +115,38 @@ class DateTestCase(unittest.TestCase):
        
         # TODO:  test is not finished.  
         # test removing a location. 
+
+    def test_static_map(self): 
+        """Test the function get_get_static_map"""
+        # create a date with adress
+        day = datetime(2008, 5, 13, 20, 30) 
+        a = Adress.objects.create(street='Breitestrasse',city='Koeln',country='de')
+        d = Date.objects.create(
+            startdate = day,   
+            starttime = time(20,30), 
+            enddate = day+timedelta(minutes=90), 
+            summary = 'Sesame Club',
+            adress = a
+            ) 
+
+        # this test will break if google changes the url
+        self.failUnless( d.get_static_map().startswith('http://maps.google.com/staticmap') )  
+
+
+        # create a date without adress
+        day = datetime(2008, 5, 13, 20, 30) 
+        d = Date.objects.create(
+            startdate = day,   
+            starttime = time(20,30), 
+            enddate = day+timedelta(minutes=90), 
+            summary = 'Sesame Club',
+            ) 
+
+        self.assertEquals(d.get_static_map(), settings.NO_STATIC_MAP) 
+       
+        #TODO: test behaviour for a date with a location with an adress
+
+        
         
 
 class LocationTestCase(unittest.TestCase):

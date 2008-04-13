@@ -20,13 +20,12 @@ DATE_CATEGORIES = {
 }
 
 COUNTRY_CHOICES = (
- ( 'de' , 'de'),
+ ('de' , 'de'),
 )
 
 class Organizer(models.Model): 
     name = models.CharField(max_length=100)
     slug = models.SlugField(prepopulate_from=('name', ))
-     
 
     #webresources = models.ManyToManyField(Webresource)
     
@@ -142,6 +141,36 @@ class Date(models.Model):
 
     # Dates have a custom manager...
     objects = DateManager() 
+
+    def has_map(self): 
+        """Returns True if date has an adress""" 
+        if not self.adress:
+            if self.location:
+                self.save() 
+            else:
+                return False
+
+        if not self.adress: 
+            return False
+  
+        if (not self.adress.lat) or (not self.adress.long):
+            self.adress.geocode() 
+
+        if (not self.adress.lat) or (not self.adress.long):
+            return False
+
+        return True 
+ 
+    def get_static_map(self): 
+        """Returns a url to a picture with a map showing the location of the date."""
+      
+        if not self.has_map():
+            return settings.NO_STATIC_MAP
+        # TODO refactor staticmaps stuff in some library function like that: static_map_uri(params) 
+        url ="""http://maps.google.com/staticmap?center=%(lat)f,%(long)f&zoom=14&size=200x200&maptype=mobile&key=%(apikey)s""" 
+        params = { 'lat': self.adress.lat, 'long': self.adress.long, 'apikey': settings.google_api_key } 
+       
+        return url % params 
 
     def __str__(self):
         return '%s - %s' % (self.startdate.strftime('%d.%m.%Y'), self.summary) 
