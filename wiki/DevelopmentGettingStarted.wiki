@@ -39,8 +39,11 @@ TEMPLATE_DEBUG = DEBUG
 DATABASE_ENGINE = "sqlite3"
 DATABASE_NAME = '/path/to/a/sqlite.db'
 
-
 google_api_key = 'your_google_api_key'
+
+TEMPLATE_DIRS = (
+    '/path/to/your/plotter-working-copy/templates',
+)
 
 ADMINS = (
      ('name', 'email@example.com'),
