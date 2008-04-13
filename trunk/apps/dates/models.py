@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from geopy import geocoders  
 
 from plotter import settings
+from plotter.utils import static_map
 from plotter.apps.dates.managers import DateManager
 
 
@@ -59,7 +60,7 @@ class Adress(models.Model):
         if not self.lat or not self.long or recode:
             # get the geocoordinates for the adress
             # TODO log geocodings into the db
-            g = geocoders.Google(settings.google_api_key)
+            g = geocoders.Google(settings.GOOGLE_API_KEY)
             adr = '%s, %s %s, %s' % (self.street, self.zipcode, self.city, self.country)
             (self.lat, self.long) = g.geocode(adr)[1]
             self.save()  
@@ -163,14 +164,15 @@ class Date(models.Model):
  
     def get_static_map(self): 
         """Returns a url to a picture with a map showing the location of the date."""
-      
         if not self.has_map():
             return settings.NO_STATIC_MAP
-        # TODO refactor staticmaps stuff in some library function like that: static_map_uri(params) 
-        url ="""http://maps.google.com/staticmap?center=%(lat)f,%(long)f&zoom=14&size=200x200&maptype=mobile&key=%(apikey)s""" 
-        params = { 'lat': self.adress.lat, 'long': self.adress.long, 'apikey': settings.google_api_key } 
+
+        params = { 
+           'lat': self.adress.lat, 
+           'long': self.adress.long, 
+        } 
        
-        return url % params 
+        return static_map(params)
 
     def __str__(self):
         return '%s - %s' % (self.startdate.strftime('%d.%m.%Y'), self.summary) 
