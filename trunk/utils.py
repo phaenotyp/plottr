@@ -31,10 +31,10 @@ def static_map(params):
     if 'markers' in params:
        markerstr = '&markers='
        ms = [] 
-       for m in params.markers: 
+       for m in params['markers']: 
            # one marker: '{latitude},{longitude},{color}{alpha-character}'
-           ms.append('%f,%f,%s%s' % (m.lat, m.long, m.get('color','red'), m.get('char',''))) 
-       markerstr = '&markers=' + '|'.joint(ms)
+           ms.append('%f,%f,%s%s' % (m['lat'], m['long'], m.get('color','red'), m.get('char',''))) 
+       markerstr = '&markers=' + '|'.join(ms)
     params['markers'] = markerstr     
     
 

@@ -170,6 +170,7 @@ class Date(models.Model):
         params = { 
            'lat': self.adress.lat, 
            'long': self.adress.long, 
+           'markers': [ { 'lat': self.adress.lat, 'long':self.adress.long  } ],
         } 
        
         return static_map(params)
