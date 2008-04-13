@@ -77,6 +77,9 @@ INSTALLED_APPS = (
     'plotter.apps.dates',
 )
 
+# url to the image indicating that there is no static map available 
+NO_STATIC_MAP = 'http://www.condominiumsph.com/img/nomap.gif'
+
 # now import local_settings, which are not under version-control.
 # see http://mccormac.org/blog/2007/mar/28/localized-settings-django/
 #  make sure there a local_settings.py file.
