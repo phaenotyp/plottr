@@ -1,4 +1,4 @@
-#summary The planned development of Plotter. Is subject to frequent reconsideration and change.
+#summary The planned development of Plotter. This hopefully is subject to frequent reconsideration and change.
 #labels Phase-Design
 
 =  Development Iterations=
