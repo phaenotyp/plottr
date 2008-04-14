@@ -17,3 +17,4 @@
   * mobile
   * feedback/impressum/about/submit a date/...
   * Save searches (see evernote.com)
+  * Fireeagle-support http://nascentguruism.com/journal/django-fireeagle
