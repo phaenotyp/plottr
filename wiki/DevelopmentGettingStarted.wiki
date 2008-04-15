@@ -31,26 +31,8 @@ Get the trunk version of plotter.
 
 ===Get Going===
 There are a couple more things to do.
-   * You need to create a _local_settings.py_ file in your project-directory. It contains the information to access the local database and other deployment specific details. It could look like this:
+   * You need to create a _local_settings.py_ file in your project-directory. It contains the information to access the local database and other deployment specific details. For further information go to [LocalSettingsPy]
 
-{{{
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
-DATABASE_ENGINE = "sqlite3"
-DATABASE_NAME = '/path/to/a/sqlite.db'
-
-GOOGLE_API_KEY = 'your_google_api_key'
-
-TEMPLATE_DIRS = (
-    '/path/to/your/plotter-working-copy/templates',
-)
-
-ADMINS = (
-     ('name', 'email@example.com'),
-)
-
-MANAGERS = ADMINS
-}}} 
 
   * Make sure you got all the packages mentioned in [Dependencies] on your System.
 
