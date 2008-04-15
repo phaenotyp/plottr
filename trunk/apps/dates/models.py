@@ -48,6 +48,10 @@ class Adress(models.Model):
 
     #location = models.ForeignKey('Location', edit_inline=models.STACKED, num_in_admin=1, blank=True, null=True, unique=True) # should be one-to-one 
 
+    def get_json(self):
+       """returns the adress as a json-object"""
+       
+
     def __str__(self): 
         return '%s, %s' % (self.street,self.city)
 
@@ -106,7 +110,7 @@ class Location(models.Model):
 class Date(models.Model):
     """Represents one Date in the Calendar"""
     slug = models.SlugField(prepopulate_from=('summary',), unique_for_date='startdate')
-    
+   
     # ical-related fields
     startdate    = models.DateField()
     starttime    = models.TimeField(blank=True, null=True)
@@ -192,7 +196,11 @@ class Date(models.Model):
     #TODO
     def as_json(self):
         """returns a json-representation of the date"""
-        return '{}'
+        json_serializer = serializers.get_serializer("json")()
+        json = json_serializer.serialize([self],
+                                   ensure_ascii=False)
+        return json
+
 
     #TODO
     def as_ical(self):

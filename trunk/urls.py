@@ -25,3 +25,11 @@ urlpatterns += patterns('',
     # plottr.de/admin/
     (r'^admin/', include('django.contrib.admin.urls')),
 )
+
+from plotter import settings
+
+# this is for testing with the development server only 
+if settings.DEVELOPMENT:
+    urlpatterns += patterns('',
+        (r'^sitemedia/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.LOCAL_MEDIA}),
+    )

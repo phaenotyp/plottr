@@ -14,14 +14,16 @@ def single(request, year, month, day, slug):
     """
     date = get_object_or_404(Date.objects.by_date('%s-%s-%s'%(year,month,day)),slug=slug) 
 
-    if request.accepts('text/html'):
-        return render_to_response('dates/single.html', {'object': date})
-      
-    if request.accepts('application/json'):    
-        return  HttpResponse(date.as_json(), mimetype='application/json') 
+    date.description = request.META['HTTP_ACCEPT'] 
 
     if request.accepts('application/ical'):    
         return  HttpResponse(date.as_ical(), mimetype='application/ical') 
+    
+    if request.accepts('application/json'):    
+        return  HttpResponse(date.as_json(), mimetype='application/json') 
+
+    if request.accepts('text/html'):
+        return render_to_response('dates/single.html', {'object': date})
     
 
 #TODO check if the following funtions can be reasonably refactored 
