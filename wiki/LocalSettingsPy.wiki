@@ -1,0 +1,33 @@
+#summary Desctipion of the file local_setting.py
+#labels Phase-Deploy,Phase-Implementation
+
+= local_settings.py =
+
+In order to run Plotter, there has to be a file named local_settings.py in the project-root-directory. 
+This file can override settings from settings.py and is not under version control. 
+It is used to express deploment specific information and keep passwords confidential.
+
+Here is an example file with dummy-data:
+
+{{{
+DEBUG = True
+TEMPLATE_DEBUG = DEBUG
+DEVELOPMENT = True
+
+LOCAL_MEDIA = '/path/to/sitemedia'
+
+DATABASE_ENGINE = "sqlite3"
+DATABASE_NAME = '/path/to/a/sqlite.db'
+
+GOOGLE_API_KEY = 'your_google_api_key'
+
+TEMPLATE_DIRS = (
+    '/path/to/your/plotter-working-copy/templates',
+)
+
+ADMINS = (
+     ('name', 'email@example.com'),
+)
+
+MANAGERS = ADMINS
+}}} 
