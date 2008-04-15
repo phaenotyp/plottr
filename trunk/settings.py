@@ -1,7 +1,10 @@
 # Django settings for plotter project.
 
+# Note: All these settings could be overriden in local_settings.py 
+# Check this possiblity when debugging. 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+DEVELOPMENT = False 
 
 DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = ''   # this is  
@@ -57,6 +60,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.doc.XViewMiddleware',
     'plotter.middleware.restful.AcceptMiddleware',
+    'plotter.middleware.debugging.AJAXSimpleExceptionResponse',
 )
 
 ROOT_URLCONF = 'plotter.urls'
