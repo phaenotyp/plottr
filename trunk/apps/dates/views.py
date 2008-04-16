@@ -28,7 +28,9 @@ def single(request, year, month, day, slug):
 
 #TODO check if the following funtions can be reasonably refactored 
 def by_date(request, date):
-    """ a list of dates, matching the parameter date"""
+    """ a list of dates, matching the parameter date
+        /dates/2009-12-23/
+    """
    # we're using the generic view with custom parameters
     return object_list(   
        request,
@@ -38,7 +40,9 @@ def by_date(request, date):
     )     
 
 def by_place(request, date, place):
-    """ a list of dates, matching the parameter date and place"""
+    """ a list of dates, matching the parameter date and place
+        /dates/2009-12-23/de-52123/
+    """
    # we're using the generic view with custom parameters
     return object_list(   
        request,

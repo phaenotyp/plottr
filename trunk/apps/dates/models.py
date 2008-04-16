@@ -193,22 +193,15 @@ class Date(models.Model):
     def startdatetime(self): 
         return datetime.combine(self.startdate, self.starttime) 
 
-    #TODO
     def as_json(self):
         """returns a json-representation of the date"""
-
-        # TODO:  this needs revisiting. 
-        # adress and location informarion should be 
-        # de-normalized into the json-output. 
-
-        # django.core.serializers don't do dynamic additions, though.
-        # see http://wolfram.kriesing.de/blog/index.php/2007/json_encode-updated
-        from django.core import serializers
-        json_serializer = serializers.get_serializer("json")()
-        json = json_serializer.serialize([self],
-                                   ensure_ascii=False)
+        from plotter.utils import json_encode
+        # the joined models are de-normalized into the the date-model
+        # in order to cut down on ajax requests.
+        self.adressdata = self.adress     
+        self.locationdata = self.location   
+        json = json_encode(self) 
         return json
-
 
     #TODO
     def as_ical(self):
