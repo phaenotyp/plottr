@@ -9,16 +9,18 @@ from plotter.utils import static_map
 from plotter.apps.dates.managers import DateManager
 
 
-DATE_CATEGORIES = {
-   'party'    : 'Party',
-   'concert'  : 'Concert',
-   'cinema'   : 'Cinema', 
-   'theater'  : 'Theater',
-   'food'     : 'Food',
-   'political': 'Political',
-   'sports'   : 'Sports',
-   'art'      : 'Art',
-}
+#TODO:  this should go to the database to avoid having to 
+# deplay new code for changing categories
+DATE_CATEGORIES = (
+  ( 'party'    , 'Party'),
+  ( 'concert'  , 'Concert'),
+  ( 'cinema'   , 'Cinema') ,
+  ( 'theater'  , 'Theater'),
+  ( 'food'     , 'Food'),
+  ( 'political', 'Political'),
+  ( 'sports'   ,  'Sports'),
+  ( 'art'      , 'Art'),
+)
 
 COUNTRY_CHOICES = (
  ('de' , 'de'),
@@ -120,6 +122,8 @@ class Date(models.Model):
     organizer    = models.ForeignKey(Organizer, blank=True, null=True) 
     location     = models.ForeignKey(Location, blank=True, null=True) 
     adress       = models.ForeignKey(Adress, blank=True, null=True) 
+
+    category = models.CharField(max_length=100, default='party', choices=DATE_CATEGORIES)
    
     # technical fields
     owner = models.ForeignKey(User, blank=True, null=True)
@@ -195,6 +199,8 @@ class Date(models.Model):
 
     def as_json(self):
         """returns a json-representation of the date"""
+        # changes to the json output should be documented in:
+        # http://code.google.com/p/plottr/wiki/JsonModels
         from plotter.utils import json_encode
         # the joined models are de-normalized into the the date-model
         # in order to cut down on ajax requests.
@@ -238,9 +244,9 @@ class Date(models.Model):
         search_fields = ('slug', 'summary', 'description') 
         date_hierarchy = 'startdate'
         fields = (
-          (None, {'fields': ('startdate','starttime','enddate','summary','slug')}),
+          (None, {'fields': ('startdate','starttime','enddate','summary','slug',)}),
           (None, {'fields': ('description', 'organizer', 'location')}),
-          (None, {'fields': ('publish', 'allowcomments')}),
+          (None, {'fields': ('publish', 'category', 'allowcomments')}),
           #('Webinfo', {'fields': ('webresources',)}),
         )
          
