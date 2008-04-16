@@ -10,6 +10,7 @@ CREATE TABLE "dates_date" (
     "organizer_id" integer NULL,
     "location_id" integer NULL,
     "adress_id" integer NULL,
+    "category" varchar(100) NOT NULL,
     "owner_id" integer NULL REFERENCES "auth_user" ("id"),
     "created" datetime NOT NULL,
     "modified" datetime NOT NULL,
