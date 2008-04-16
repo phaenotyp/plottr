@@ -200,6 +200,7 @@ class Date(models.Model):
         # in order to cut down on ajax requests.
         self.adressdata = self.adress     
         self.locationdata = self.location   
+        self.absolute_url = self.get_absolute_url() 
         json = json_encode(self) 
         return json
 
