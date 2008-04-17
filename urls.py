@@ -27,7 +27,6 @@ urlpatterns += patterns('',
 )
 
 from plotter import settings
-
 # this is for testing with the development server only 
 if settings.DEVELOPMENT:
     urlpatterns += patterns('',
