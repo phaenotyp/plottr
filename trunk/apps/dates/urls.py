@@ -28,8 +28,13 @@ urlpatterns = patterns('plotter.apps.dates.views',
     # plottr.de/dates/tommorrow/1.231233,2.34234/5km/   
     (r'(?P<date>[-\w]+)/(?P<geo>[THISNEEDSAREGEX])/(?P<distance>\w+)/$', 'by_geo'),
 
+
+    # a list of all dates 
+    # a generic view is used but it's wrapped in a custom-view to allow 
+    # content-negotiation. 
+    ('', 'date_list' ), 
 )
 
-urlpatterns += patterns('',
+urlpatterns__ = patterns('',
    ('', list_detail.object_list, {'queryset': Date.objects.all(),  'template_name': 'dates/list.html', 'template_object_name': 'dates',} ),
 ) 

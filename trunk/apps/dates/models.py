@@ -187,6 +187,7 @@ class Date(models.Model):
         return '%s - %s' % (self.startdate.strftime('%d.%m.%Y'), self.summary) 
 
     def get_absolute_url(self):
+        "returns the unique url to this date"
         return ('single', (), {
            'year': self.startdate.year,
            'month': self.startdate.month,
@@ -195,6 +196,7 @@ class Date(models.Model):
     get_absolute_url = models.permalink(get_absolute_url)
 
     def startdatetime(self): 
+        "Returns a datetime object for the start-date and time of the date" 
         return datetime.combine(self.startdate, self.starttime) 
 
     def as_json(self):
@@ -233,7 +235,6 @@ class Date(models.Model):
 
     # should there be special fields for musical events like 'performer'?
     # sould there be a field for a entry-fee?
-    # should there be a field 
     class Meta:
         get_latest_by = 'startdate'
         ordering = ['startdate', 'starttime', 'location', 'slug']

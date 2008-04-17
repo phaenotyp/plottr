@@ -4,8 +4,8 @@ from django.core import serializers
 from django.http import HttpResponse
 
 from plotter.apps.dates.models import Date
+from plotter.utils import json_encode
 from datetime import datetime, timedelta
-
 
 
 def single(request, year, month, day, slug): 
@@ -24,32 +24,65 @@ def single(request, year, month, day, slug):
 
     if request.accepts('text/html'):
         return render_to_response('dates/single.html', {'object': date})
-    
+   
+
+def date_list(request):
+    """ a list of dates
+    """
+    if request.accepts('application/json'):    
+        dates = Date.objects.published()  
+        for d in dates:
+            d.absolute_url = d.get_absolute_url() 
+        return  HttpResponse(json_encode(dates), mimetype='application/json') 
+       
+
+    if request.accepts('text/html'):
+        # using the generic view with custom parameters
+        return object_list(   
+           request,
+           queryset = Date.objects.published(),
+           template_name='dates/list.html',
+           template_object_name='dates'
+        )     
 
 #TODO check if the following funtions can be reasonably refactored 
 def by_date(request, date):
     """ a list of dates, matching the parameter date
         /dates/2009-12-23/
     """
-   # we're using the generic view with custom parameters
-    return object_list(   
-       request,
-       queryset = date.objects.by_date(date),
-       template_name='dates/list.html',
-       template_object_name='dates'
-    )     
+    dates = Date.objects.by_date(date)  
+    if request.accepts('application/json'):    
+        for d in dates:
+            d.absolute_url = d.get_absolute_url() 
+        return  HttpResponse(json_encode(dates), mimetype='application/json') 
+ 
+
+    if request.accepts('text/html'):
+        # using the generic view with custom parameters
+        return object_list(   
+           request,
+           queryset = dates,
+           template_name='dates/list.html',
+           template_object_name='dates'
+        )     
 
 def by_place(request, date, place):
     """ a list of dates, matching the parameter date and place
         /dates/2009-12-23/de-52123/
     """
-   # we're using the generic view with custom parameters
-    return object_list(   
-       request,
-       queryset = date.objects.by_date_and_place(date, place),
-       template_name='dates/list.html',
-       template_object_name='dates'
-    )     
+    if request.accepts('application/json'):    
+        for d in dates:
+            d.absolute_url = d.get_absolute_url() 
+        return  HttpResponse(json_encode(dates), mimetype='application/json') 
+ 
+    if request.accepts('text/html'):
+        # using the generic view with custom parameters
+        return object_list(   
+           request,
+           queryset = Date.objects.by_date_and_place(date, place),
+           template_name='dates/list.html',
+           template_object_name='dates'
+        )     
 
 
 def by_geo(request, date, geo, distance):
