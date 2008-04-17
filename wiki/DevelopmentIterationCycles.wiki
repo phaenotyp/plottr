@@ -9,7 +9,10 @@
     * browser-interface - reading
     * django-admin interface
     * json
+
+  * 1.2 *Comments*
     * commenting
+    * tagging (?)
 
   * 1.5  *Geo*
     * map-view
