@@ -1,0 +1,44 @@
+<html>
+ <head>
+  <title>Test Page for plotter.js</title>
+  <script language="javascript" src="jsunit/app/jsUnitCore.js"></script>
+  <script language="javascript" src="js/taffy.js"></script>
+  <script language="javascript" src="js/jquery/jquery.js"></script>
+  <script language="javascript" src="js/plotter.js"></script>
+ </head>
+ <body>
+  <script language="javascript">
+
+    function testTemplate(){ 
+        var template = 'My name is {{ name }}.';
+        var context = { name : 'Harold' }; 
+        assertEquals('My name is Harold.', PLTR.template.render(template, context));
+        
+    }
+
+    function testInfobar() {
+        var msg = 'testing infobar';
+        PLTR.infobar.message(msg);
+        assertEquals('Infobar should contain message-text', 
+           msg, $(PLTR.conf.selectors.infobar_msg).text() );
+
+    }
+
+    function testLog() {
+       PLTR.log('test'); 
+       // i dont think this is testable. just wanna execte it in case 
+       // of typo. does jsunit require an assertion in a test-func?
+    }
+  </script>
+<!-- -->
+   <div id="header">
+      <h1>PLOTTR</h1>
+   </div>
+   <div id="navi"></div>
+   <div id="infobar"></div>
+   <div id="content">
+      <div id="primary"></div>
+      <div id="secondary"></div>
+   </div>
+ </body>
+</html>
