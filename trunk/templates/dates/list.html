@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block primary %}
 <h1>All Dates</h1>
 <ul>
 {% for dt in dates_list %}
   <li><a href="{{ dt.get_absolute_url  }}">{{ dt.summary }}</a></li>
-
+  
 
 
 
