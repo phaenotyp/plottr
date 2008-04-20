@@ -9,7 +9,38 @@
  <body>
   <script language="javascript">
 
+    function testQueryValidation(){
+        // tests if validation of a query-object with _validate_query works
+        // test correct
+        query = {country : 'de', zip : '53111', date : '2008-11-21'};
+        assertTrue('Correct Query', PLTR.dates._validate_query(query));
+
+        query.zip = '50';
+        assertTrue('Correct Query - short zip', PLTR.dates._validate_query(query));
+ 
+        // test wrong
+        query.date = 'derm';
+        assertFalse('Defect Date', PLTR.dates._validate_query(query));
+
+        query.date = '2008-12-12';
+        query.zip = 'derm' 
+        assertFalse('Defect Zip', PLTR.dates._validate_query(query));
+
+
+        //TODO
+        // testcase is incomplete. other defect queries should be tested
+    }
+
+    function testUrlBuildingFromQuery(){
+        // tests if construction of a url from a query object works
+        query = { country : 'de', zip : '53111', date : '2008-11-21' };
+        url = PLTR.dates._query_url(query);
+        assertEquals('/dates/2008-11-21/de-53111/', url);
+
+    }
+
     function testTemplate(){ 
+        // tests the mini-template engine of plotter
         var template = 'My name is {{ name }}.';
         var context = { name : 'Harold' }; 
         assertEquals('My name is Harold.', PLTR.template.render(template, context));
