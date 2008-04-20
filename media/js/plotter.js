@@ -103,7 +103,7 @@ var PLTR = {
         }
         return url;
      },
-     db : new TAFFY([]),
+     db : new TAFFY([]), // the db that contains the local copy of the dates.
      load : function(query, callback){
         // gets a list of dates from the server and fires onDatesLoad event.
         query = jQuery.extend(new PLTR.clone(PLTR.conf.default_query), query); // provide default values.

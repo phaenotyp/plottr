@@ -14,8 +14,6 @@ def single(request, year, month, day, slug):
     """
     date = get_object_or_404(Date.objects.by_date('%s-%s-%s'%(year,month,day)),slug=slug) 
 
-    date.description = request.META['HTTP_ACCEPT'] 
-
     if request.accepts('application/ical'):    
         return  HttpResponse(date.as_ical(), mimetype='application/ical') 
     
