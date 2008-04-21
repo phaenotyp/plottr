@@ -7,6 +7,7 @@ example_query = {
 }
 */
 
+var slow = 'slow';
 // one root object not to pollute the namespace
 var PLTR = {
    log :  console.log || window.alert,
@@ -16,14 +17,23 @@ var PLTR = {
          content : '#content',
          main : '#primary',
          sidebar : '#secondary',
+                          
+         // the items of the navigation in the header 
+         header_navi : 'ul#headnavi>li',
+         // the containers of the navigation elements in the header
+         header_navi_contents : '.headnavi_cont',
+         // the infobar displays messages to the user
          infobar_container : '#infobar',
-         infobar_msg : '#infobar',
+         infobar_msg : '#infobar',  // the messages are in the innerHtml of this
          eventhook : '#head'   // this is the node that takes the custom events.
       },
       // mappping to classes in css files
       // not sure if this is necessary. let's see.
       css : {
-
+          // to keep design an layout separated and still provide fallback 
+          // the classname dynamic is used to introduce layout changes with
+          // javascript
+          dynamic : 'dynamic' 
 
       },
       // events, define bindings via jquery
@@ -59,6 +69,9 @@ var PLTR = {
             return true;
          },
          zip : function(subject){
+            // so far only german zip-code (postleitzahlen) are valid.
+            // the system is supposed to treat too short zip-codes
+            // as if there was a trailing wildcard. 
             return (new RegExp('^\\d{1,5}$').test(subject)); 
          }  
          
@@ -133,6 +146,22 @@ var PLTR = {
        // should this somehow be templated?
      },
    },
+   header : { 
+    // behaviour of the header. mainly the navigation in the header.
+    init : function(){ 
+       // hide the content of the header navi   
+       $(PLTR.conf.selectors.header_navi_contents)
+         .addClass(PLTR.conf.css.dynamic)
+         .hide();
+       $(PLTR.conf.selectors.header_navi).bind('mouseenter', function(){
+           $(PLTR.conf.selectors.header_navi_contents).hide();
+           $(this).find(PLTR.conf.selectors.header_navi_contents).show();
+       });
+       
+       // show them on mouse-over
+    } 
+
+   },
    // behaviour of the sidebar
    sidebar : {
       hide : function(){
@@ -182,6 +211,7 @@ var PLTR = {
           return text;
        }
    },
+   // from the future: 
    map : {
       hide : function(){
       },
@@ -205,6 +235,11 @@ var PLTR = {
    },
    // initialises Plotter.
    init : function(){
+       
+      // enhance the headers behaviour.
+      PLTR.header.init(); 
+
+      // assign sesible defaults to all ajax-calls.
       jQuery.ajaxSetup(PLTR.conf.jquery_ajax_defaults);
 
       // bind events
@@ -212,3 +247,6 @@ var PLTR = {
 
    }
 };  // end of PLTR;
+
+
+$(PLTR.init); 
