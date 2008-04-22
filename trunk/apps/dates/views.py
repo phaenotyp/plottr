@@ -27,11 +27,12 @@ def single(request, year, month, day, slug):
 def date_list(request):
     """ a list of dates
     """
-    print 'list'
     if request.accepts('application/json'):    
         dates = Date.objects.published()  
         for d in dates:
             d.absolute_url = d.get_absolute_url() 
+            d.adressdata = d.adress
+            d.locationdata = d.location
         return  HttpResponse(json_encode(dates), mimetype='application/json') 
        
 
@@ -49,11 +50,12 @@ def by_date(request, date):
     """ a list of dates, matching the parameter date
         /dates/2009-12-23/
     """
-    print 'only date'
     dates = Date.objects.by_date(date)  
     if request.accepts('application/json'):    
         for d in dates:
             d.absolute_url = d.get_absolute_url() 
+            d.adressdata = d.adress
+            d.locationdata = d.location
         return  HttpResponse(json_encode(dates), mimetype='application/json') 
  
 
@@ -75,6 +77,8 @@ def by_place(request, date, country, zip=None):
     if request.accepts('application/json'):    
         for d in dates:
             d.absolute_url = d.get_absolute_url() 
+            d.adressdata = d.adress
+            d.locationdata = d.location
         return  HttpResponse(json_encode(dates), mimetype='application/json') 
  
     if request.accepts('text/html'):
