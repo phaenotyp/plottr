@@ -127,6 +127,9 @@ var PLTR = {
            $.ajax({
               url: url,
               success : function( json ){
+                 $.each(json, function(index, value){ 
+                    PLTR.dates.db.insert(value); 
+                 });
                  // fill PLTR.dates.db with
                  // TODO
                  // trigger an event
@@ -153,12 +156,13 @@ var PLTR = {
        $(PLTR.conf.selectors.header_navi_contents)
          .addClass(PLTR.conf.css.dynamic)
          .hide();
+       
+       // show single items on mouse-over
        $(PLTR.conf.selectors.header_navi).bind('mouseenter', function(){
            $(PLTR.conf.selectors.header_navi_contents).hide();
            $(this).find(PLTR.conf.selectors.header_navi_contents).show();
        });
        
-       // show them on mouse-over
     } 
 
    },
@@ -179,7 +183,7 @@ var PLTR = {
        },
        error : function(msg){
           // displays an error-message
-          $(PLTR.conf.selectors.infobar).text(msg)..show();
+          $(PLTR.conf.selectors.infobar).text(msg).show();
        },
        poll_server : function(msg){
           // checks server for messages and displays them
