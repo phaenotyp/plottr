@@ -24,12 +24,14 @@ class DateManager(models.Manager):
         return self.published().filter(adress__country__iexact=country, adress__zipcode__istartswith=zipcode)
 
     def by_date_and_place(self, date, place):
+        print place
         (country, zipcode) = place.split('-')
         return self.by_date(date).filter(adress__country__iexact=country, adress__zipcode__istartswith=zipcode)
 
     def by_date(self, date):
         """Returns a queryset of dates matching a date"""
 
+        print date
         # TODO handle the case if date is a datetime-object
 
         # first try if date matches a set of strings 

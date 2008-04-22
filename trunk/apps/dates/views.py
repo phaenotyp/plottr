@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 
 def single(request, year, month, day, slug): 
     """One single date.
-       /dates/2008/03/17/domingo-club/
+       /dates/2008-03-17/domingo-club/
     """
     date = get_object_or_404(Date.objects.by_date('%s-%s-%s'%(year,month,day)),slug=slug) 
 
@@ -27,6 +27,7 @@ def single(request, year, month, day, slug):
 def date_list(request):
     """ a list of dates
     """
+    print 'list'
     if request.accepts('application/json'):    
         dates = Date.objects.published()  
         for d in dates:
@@ -48,6 +49,7 @@ def by_date(request, date):
     """ a list of dates, matching the parameter date
         /dates/2009-12-23/
     """
+    print 'only date'
     dates = Date.objects.by_date(date)  
     if request.accepts('application/json'):    
         for d in dates:
@@ -68,6 +70,8 @@ def by_place(request, date, place):
     """ a list of dates, matching the parameter date and place
         /dates/2009-12-23/de-52123/
     """
+    print 'place and date'
+    dates = Date.objects.by_date_and_place(date, place)
     if request.accepts('application/json'):    
         for d in dates:
             d.absolute_url = d.get_absolute_url() 
@@ -77,7 +81,7 @@ def by_place(request, date, place):
         # using the generic view with custom parameters
         return object_list(   
            request,
-           queryset = Date.objects.by_date_and_place(date, place),
+           queryset = dates,
            template_name='dates/list.html',
            template_object_name='dates'
         )     
