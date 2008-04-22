@@ -66,12 +66,12 @@ def by_date(request, date):
            template_object_name='dates'
         )     
 
-def by_place(request, date, place):
+def by_place(request, date, country, zip=None):
     """ a list of dates, matching the parameter date and place
         /dates/2009-12-23/de-52123/
     """
     print 'place and date'
-    dates = Date.objects.by_date_and_place(date, place)
+    dates = Date.objects.by_date_and_place(date, country, zip)
     if request.accepts('application/json'):    
         for d in dates:
             d.absolute_url = d.get_absolute_url() 

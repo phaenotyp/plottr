@@ -60,11 +60,11 @@ class DateManagerTestCase(unittest.TestCase):
 
 
     def test_bydateandplace(self):      
-        dates = Date.objects.by_date_and_place('2009-09', 'de-50')
+        dates = Date.objects.by_date_and_place('2009-09', 'de', '50')
         self.failUnless(len(dates)>2, 'len(dates)==%s' % str(len(dates)) )
         self.failUnless(len(dates)<5)
          
-        dates = Date.objects.by_date_and_place('2009-09', 'de-53117')
+        dates = Date.objects.by_date_and_place('2009-09', 'de', '53117')
         self.failUnless(len(dates)>2)
         self.failUnless(len(dates)<5)
 

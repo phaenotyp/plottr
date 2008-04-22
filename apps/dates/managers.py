@@ -19,19 +19,23 @@ class DateManager(models.Manager):
         """returns a queryset of all published dates today"""
         return self.oneday(datetime.datetime.today())
 
+
+    # umaintained and depreciated
     def by_place( self, place ):
+       
         (country, zipcode) = place.split('-')
         return self.published().filter(adress__country__iexact=country, adress__zipcode__istartswith=zipcode)
 
-    def by_date_and_place(self, date, place):
-        print place
-        (country, zipcode) = place.split('-')
-        return self.by_date(date).filter(adress__country__iexact=country, adress__zipcode__istartswith=zipcode)
+    def by_date_and_place(self, date, country='de', zipcode=None ):
+        """returns a queryset of dates matching date, country and zip"""
+        qs = self.by_date(date).filter(adress__country__iexact=country) 
+        if zipcode: 
+            qs = qs.filter(adress__zipcode__istartswith=str(zipcode))
+        return qs 
 
     def by_date(self, date):
         """Returns a queryset of dates matching a date"""
 
-        print date
         # TODO handle the case if date is a datetime-object
 
         # first try if date matches a set of strings 
