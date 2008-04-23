@@ -17,6 +17,8 @@
 
         query.zip = '50';
         assertTrue('Correct Query - short zip', PLTR.dates._validate_query(query));
+        query.zip = [12345,54321];
+        assertTrue('Correct Query - zip-array', PLTR.dates._validate_query(query));
  
         // test wrong
         query.date = 'derm';
@@ -25,6 +27,9 @@
         query.date = '2008-12-12';
         query.zip = 'derm' 
         assertFalse('Defect Zip', PLTR.dates._validate_query(query));
+        query.zip = [] 
+        assertFalse('Defect Zip - empty array', PLTR.dates._validate_query(query));
+
 
 
         //TODO
@@ -35,7 +40,13 @@
         // tests if construction of a url from a query object works
         query = { country : 'de', zip : '53111', date : '2008-11-21' };
         url = PLTR.dates._query_url(query);
-        assertEquals('/dates/2008-11-21/de-53111/', url);
+        assertEquals('/dates/2008-11-21/de/53111/', url);
+
+        query = { country : 'de', zip : [53111, 50672], date : '2008' };
+        url = PLTR.dates._query_url(query);
+        assertEquals('/dates/2008/de/53111,50672/', url);
+
+
 
     }
 

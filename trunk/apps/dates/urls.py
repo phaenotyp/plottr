@@ -39,6 +39,10 @@ urlpatterns = patterns('plotter.apps.dates.views',
     # plottr.de/dates/1234/
     url(r'id/(?P<id>\d+)/$', 'single_by_id', name='single_by_id'),
 
+     
+    # this is an older, more verbose version of the url of a single
+    # date, maybe there should be a version with the slug 
+    # for pretty links. 
     # one single date
     # plottr.de/dates/2008-04-14/click-clack-club/     
 #    url(r'(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})/(?P<slug>[-\w]+)/$',
