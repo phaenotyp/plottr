@@ -70,12 +70,22 @@ var PLTR = {
          },
          zip : function(subject){
             // so far only german zip-code (postleitzahlen) are valid.
-            // the system is supposed to treat too short zip-codes
-            // as if there was a trailing wildcard. 
-            return (new RegExp('^\\d{1,5}$').test(subject)); 
+            // either a list of zip or a single posibly partial zip are 
+            // valid
+            if( PLTR.isArray(subject)){
+               if(subject.length == 0) return false; 
+               for(var i=subject.length-1; i>=0; i-- ){
+                  if( !new RegExp('^\\d{5}$').test(subject[i]) ){ 
+                     return false; 
+                  }
+               }
+               return true;
+            } else {
+               // the system is supposed to treat too short zip-codes
+               // as if there was a trailing wildcard. 
+               return (new RegExp('^\\d{1,5}$').test(subject)); 
+            }
          }  
-         
-
       },
       url_template : '/dates/{{ date }}/',
       date_template : '',
@@ -105,21 +115,26 @@ var PLTR = {
      },
      _query_url : function(query){
         // takes a query-object and returns a url to get matching dates from the server.
+        if(!this._validate_query(query)){ return false };
+        query = jQuery.extend(new PLTR.clone(PLTR.conf.default_query), query); // provide default values.
         var url = '/dates/';
         if(query.date) url += query.date + '/';
         if(query.country){
-           url += query.country;
+           url += query.country + '/';
            if(query.zip){
-             url += '-' + query.zip;
+              if(query.zip.join){
+                 url += query.zip.join(',');
+              } else {
+                 url += query.zip;
+              }
+              url += '/';
            }
-           url += '/';
         }
         return url;
      },
      db : new TAFFY([]), // the db that contains the local copy of the dates.
      load : function(query, callback){
         // gets a list of dates from the server and fires onDatesLoad event.
-        query = jQuery.extend(new PLTR.clone(PLTR.conf.default_query), query); // provide default values.
         if( PLTR.dates._validate_query(query) ){ // validate the query
            var url = PLTR.dates._query_url(query);
            $(PLTR.conf.selectors.eventhook).trigger(PLTR.conf.events.beforeDatesLoad); // trigger event.
@@ -236,6 +251,10 @@ var PLTR = {
             this[attr] = new cloneObject(obj[attr]); 
          } else this[attr] = obj[attr];
       }
+   },
+   isArray : function(obj){
+       // returns true if the passed object is an array
+       return (obj.constructor.toString().indexOf("Array") != -1); 
    },
    // initialises Plotter.
    init : function(){
