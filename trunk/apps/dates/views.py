@@ -50,6 +50,8 @@ def by_date(request, date):
     """ a list of dates, matching the parameter date
         /dates/2009-12-23/
     """
+    
+
     dates = Date.objects.by_date(date)  
     if request.accepts('application/json'):    
         for d in dates:
