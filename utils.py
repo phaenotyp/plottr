@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from plotter import settings
 
 def static_map(params):
@@ -42,6 +43,54 @@ def static_map(params):
 
     return url % params
 
+
+def selection_description(date, country, zip=None): 
+    """returns a string description of a selection of dates"""
+    date = date.split('-')
+    out = 'Termine'
+    if len(date)==3:
+        out += ' am %s.%s.%s' % (date[2],date[1],date[0])
+    elif len(date)==2:
+        monthnames = ' ,Januar,Februar,Maerz,April,Mai,Juni,Juli,August,September,Oktober,Noveber,Dezember'.split(',')
+        out += ' im %s %s' % (monthnames[int(date[1])],date[0])
+    else: 
+        out += ' ' +str(date[0])
+    if country and not zip:
+        if country == 'de':
+            out += ' in Deutschland'
+    if zip: 
+        zipmap = {
+           (50667, 50668, 50670, 50672): u'Köln-Neustadt-Nord',
+           (50823, 50825) : u'Köln-Neuehrenfeld', 
+           (50679,) : u'Köln-Deutz', 
+           (50935, 50937, 50939) : u'Köln-Sülz', 
+           (50823, 50825) : u'Köln-Ehrenfeld',
+           tuple(range(50441, 51149)) : u'Köln',
+           tuple(range(53111, 53229)) : u'Bonn'
+        }  
+        matches = [] 
+        checked = []
+        for zipps in zipmap.keys(): 
+            for zipp in zipps:
+                if zipp not in checked and \
+                   str(zipp).startswith(str(zip)) and \
+                   zipmap[zipps] not in matches:
+                    matches.append(zipmap[zipps]) 
+                    checked.append(zipp) 
+        hits = len(matches)
+        if hits >= 3: 
+            out += ' in ' + ', '.join(matches[0:-1]) + ' und ' + matches[hits-1] 
+        elif hits == 2:
+            out += ' in ' +  ' und '.join(matches)   
+        elif hits == 1:
+            out += ' in %s' %  matches[0] 
+        elif len(str(zip)) < 5: 
+            out += ' im Postleitzahlenbereich %s.' % str(zip) + '*'
+        else:
+            out += ' mit plz %s.'  % str(zip)
+    return out
+            
+ 
 
 
 
