@@ -186,14 +186,21 @@ class Date(models.Model):
     def __str__(self):
         return '%s - %s' % (self.startdate.strftime('%d.%m.%Y'), self.summary) 
 
-    def get_absolute_url(self):
+    def _get_absolute_url(self):
         "returns the unique url to this date"
-        return ('single', (), {
+        return ('single_by_id', (), {
            'year': self.startdate.year,
            'month': self.startdate.month,
            'day': self.startdate.day,
            'slug': self.slug})
+    _get_absolute_url = models.permalink(_get_absolute_url)
+
+    def get_absolute_url(self):
+        "returns the unique url to this date"
+        return ('single_by_id', (), {
+           'id': self.id })
     get_absolute_url = models.permalink(get_absolute_url)
+
 
     def startdatetime(self): 
         "Returns a datetime object for the start-date and time of the date" 
