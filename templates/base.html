@@ -39,7 +39,38 @@
       </ul>
    </div>
    <div id="infobar"></div>
-   <div id="navi"></div>
+   <div id="navi">
+      <div id="dataset-description">Alle Termine von heute in Bonn-Altstadt</div>
+      <!-- this is the fallback form in case js is off -->
+      <form name="navi_fallback_form" class="fallback" method="get" action="/dates/redirect/">
+        <label for="date">Datum:</label><input type="text" name="date" size="10" maxlength="10"  />  
+        <label for="country">Land:</label><input type="text" name="country" size="2" maxlength="2" />  
+        <label for="zips">PLZ:</label><input type="text" name="zips" />  
+        <input type="submit" />
+      </form>
+
+      <div class="widget" id="navi_date">
+      <h2>Zeitraum</h2>
+      <div id="navi_date_selection" class="selection">Today</div>
+      <ul id="navi_date_options">
+         <li>All</li>
+         <li class="selected">Today</li>
+         <li>Tomorrow</li>
+         <li><input type="text" id="navi_zips_input" /></li>
+      </ul>      
+      </div>
+
+      <div id="navi_zips" class="widget">
+      <h2>Postleitzahl</h2>
+      <div id="navi_zips_selection" class="selection">53111</div>
+         <input type="text" id="navi_zips_input" />
+      </div>
+
+      <div id="navi_submit" class="widget">
+         <h2>Submit</h2>
+      </div>
+  
+   </div>
    <div id="content">
    {% block content %}
       <div id="primary">{% block primary %}{% endblock %}</div> 
