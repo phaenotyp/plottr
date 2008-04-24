@@ -20,6 +20,10 @@ var PLTR = {
                       
          // this is the element that hold the dates. 
          dates_container : 'ul#dates',   
+          
+         // the navigation bar   
+         queryeditor : 'div#navi', 
+
          // the items of the navigation in the header 
          header_navi : 'ul#headnavi>li',
          // the containers of the navigation elements in the header
@@ -56,7 +60,8 @@ var PLTR = {
          // query validation contains functions to validate members of a query object.
          // every function validates the member of a query with the same name.
          // all members are optional.
-         // if there shold be required members, a proptery of the validation function, would be a good idea. (_validate_query would have to be modified.)
+         // if there shold be required members, a proptery of the validation function, would be a good idea.
+         // (_validate_query would have to be modified.)
          date : function(subject){
             // this validates the date part of a query. 
             var literals = ['today', 'tomorrow'];
@@ -192,7 +197,6 @@ var PLTR = {
     init : function(){ 
        // hide the content of the header navi   
        $(PLTR.conf.selectors.header_navi_contents)
-         .addClass(PLTR.conf.css.dynamic)
          .hide();
        
        // show single items on mouse-over
@@ -202,8 +206,14 @@ var PLTR = {
        });
        
     } 
-
    },
+   navi : {
+    // the navigation-bar or 'query-editor' 
+    init : function(){
+      // $(PLTR.conf.selectors.queryeditor).addClass(PLTR.conf.css.dynamic); 
+    } 
+
+   }, 
    // behaviour of the sidebar
    sidebar : {
       hide : function(){
@@ -315,13 +325,22 @@ var PLTR = {
    },
    // initialises Plotter.
    init : function(){
+
+      // body gets the class dynamic.
+      // all css-changes for stepwise enhancement of the site 
+      // should be hooked to that class.
+      $('body').addClass(PLTR.conf.css.dynamic);
+
       // call individual init functions.
-      // TODO: think about iterating over all first level members of PLTR 
-      // and executing each init()  
-      // enhance the  behaviour of the header navi.
-      PLTR.header.init(); 
-      // enhance the  behaviour of the header navi.
-      PLTR.infobar.init(); 
+      // iterating over the subsections of PLTR and call any init() 
+      // in the first-child-level
+      for( section in PLTR){
+         if(  typeof(PLTR[section])=='object'){
+            if( PLTR[section].init  && $.isFunction(PLTR[section].init)){ 
+               PLTR[section].init(); 
+            }
+         }
+      }
 
       // assign sesible defaults to all ajax-calls.
       jQuery.ajaxSetup(PLTR.conf.jquery_ajax_defaults);

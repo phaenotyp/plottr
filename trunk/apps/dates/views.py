@@ -1,13 +1,21 @@
 from django.views.generic.list_detail import object_list
 from django.shortcuts import get_object_or_404, render_to_response
 from django.core import serializers
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 
 from plotter.apps.dates.models import Date
 from plotter.utils import json_encode
 from datetime import datetime, timedelta
 
+def redirect( request ): 
+    url = '/dates/' 
+    url += request.GET.get('date', '2008') + '/'
+    url += request.GET.get('country', 'de') + '/'
+    if request.GET.has_key('zip'): url += request.GET['zip'] + '/'
+    return HttpResponseRedirect(url) 
+     
 
+# the views that retrn a single date.
 def single_response(request, date):
     """Takes a single date and generates a response for it based on accept header"""
     if request.accepts('application/ical'):

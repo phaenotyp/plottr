@@ -5,19 +5,14 @@ from apps.dates.models import Date
 
 urlpatterns = patterns('plotter.apps.dates.views',
 
-    # dates filtered by date and place 
-    # plottr.de/dates/2008-07/de-53175/
-    # plottr.de/dates/all/koeln/   ?? 
-#    (r'(?P<date>[-\w]+)/(?P<place>[-\w]+)/$', 'by_place'),
-   
+
+    # redirect takes date, country and zip as get-parameters 
+    # and redirects to the according url
+    (r'redirect/', 'redirect' ), 
+  
     # dates filtered by date and country
     # plottr.de/dates/2008-07/de/
     (r'(?P<date>[-\w]+)/(?P<country>[a-z]{2})/$', 'by_place'),
-
-    # dates filtered by date, country & zipcode,  shortened zipcodes should be treated as wildcards
-    # plottr.de/dates/2008-07/de-50672/
-    # plottr.de/dates/today/de-50/
-#    (r'(?P<date>[-\w]+)/(?P<country>[a-z]{2})-(?P<zip>\d{1,5})/$', 'by_place'),
 
     # dates filtered by date, country & zipcode,  shortened zipcodes should be treated as wildcards
     # plottr.de/dates/2008-07/de/50672/
