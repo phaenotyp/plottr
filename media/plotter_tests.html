@@ -46,9 +46,20 @@
         url = PLTR.dates._query_url(query);
         assertEquals('/dates/2008/de/53111,50672/', url);
 
-
-
     }
+
+    function testIsArray(){
+       // tests the function PLTR.isArray(obj) which should return true
+       // if the passed object is an array
+       var a = [122, 313 ,213 ];
+       var na1 = 21; 
+       var na2 = '3434';
+       var na3 = {derm : 'der'}; 
+       assertTrue(PLTR.isArray(a));
+       assertFalse(PLTR.isArray(na1));
+       assertFalse(PLTR.isArray(na2));
+       assertFalse(PLTR.isArray(na3));
+    } 
 
     function testTemplate(){ 
         // tests the mini-template engine of plotter
@@ -79,7 +90,7 @@
    <div id="navi"></div>
    <div id="infobar"></div>
    <div id="content">
-      <div id="primary"></div>
+      <div id="primary"><ul id="dates"></ul></div>
       <div id="secondary"></div>
    </div>
  </body>

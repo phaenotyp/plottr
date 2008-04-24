@@ -17,7 +17,9 @@ var PLTR = {
          content : '#content',
          main : '#primary',
          sidebar : '#secondary',
-                          
+                      
+         // this is the element that hold the dates. 
+         dates_container : 'ul#dates',   
          // the items of the navigation in the header 
          header_navi : 'ul#headnavi>li',
          // the containers of the navigation elements in the header
@@ -25,7 +27,7 @@ var PLTR = {
          // the infobar displays messages to the user
          infobar_container : '#infobar',
          infobar_msg : '#infobar',  // the messages are in the innerHtml of this
-         eventhook : '#head'   // this is the node that takes the custom events.
+         eventhook : '#header'   // this is the node that takes the custom events.
       },
       // mappping to classes in css files
       // not sure if this is necessary. let's see.
@@ -87,8 +89,7 @@ var PLTR = {
             }
          }  
       },
-      url_template : '/dates/{{ date }}/',
-      date_template : '',
+      date_template : '<li><a href="{{ absolute_url }}">{{ summary }}</a> - {{ startdate }}</li>',
       jquery_ajax_defaults : {
          dataType: 'json',
          type: 'GET',
@@ -115,17 +116,19 @@ var PLTR = {
      },
      _query_url : function(query){
         // takes a query-object and returns a url to get matching dates from the server.
+        // TODO should be able to take a date-object as date
         if(!this._validate_query(query)){ return false };
         query = jQuery.extend(new PLTR.clone(PLTR.conf.default_query), query); // provide default values.
+        // build the url 
         var url = '/dates/';
-        if(query.date) url += query.date + '/';
-        if(query.country){
+        if(query.date) url += query.date + '/'; // date
+        if(query.country){                     // country
            url += query.country + '/';
-           if(query.zip){
+           if(query.zip){                 // zip is only possible with country 
               if(query.zip.join){
-                 url += query.zip.join(',');
+                 url += query.zip.join(',');  // a list of zips
               } else {
-                 url += query.zip;
+                 url += query.zip; /// a single or partial zip
               }
               url += '/';
            }
@@ -142,11 +145,12 @@ var PLTR = {
            $.ajax({
               url: url,
               success : function( json ){
+                 PLTR.log('dates loaded');
+                 PLTR.dates.db = new TAFFY([])
+                 // fill PLTR.dates.db with
                  $.each(json, function(index, value){ 
                     PLTR.dates.db.insert(value); 
                  });
-                 // fill PLTR.dates.db with
-                 // TODO
                  // trigger an event
                  $(PLTR.conf.selectors.eventhook).trigger(PLTR.conf.events.onDatesLoad);
               }
@@ -159,7 +163,26 @@ var PLTR = {
      reload : function( datelist, callback ){  // is reload a keyword?
        // get the listed dates from the server and updates the taffydb.
      },
-     render : function( dateid ){
+     renderone : function(datex, target ){
+        // renders one date (json) with the template in
+        // PLTR.conf.date_template and appends it to target 
+        // if target is not given the selector 'dates_containter'
+        // is used instead
+        target = target || PLTR.conf.selectors.dates_container;
+        var rendered = PLTR.template.render(PLTR.conf.date_template, datex); 
+        $(target).append(rendered); 
+        return rendered;
+     },  
+     render : function(obj, target){
+       // TODO better description of function
+       // this goes through the passed list 
+       // and calls renderone for each element
+       target = target || PLTR.conf.selectors.dates_container;
+       obj = obj || PLTR.dates.db.get(); 
+       $(target).empty(); 
+       for(var i=0, max=obj.length; i<max; i++){
+          PLTR.dates.renderone(obj[i], target);
+       }
        // gets a date from taffydb and returns a domnode/html-represention.
        // should this somehow be templated?
      },
@@ -259,14 +282,17 @@ var PLTR = {
    // initialises Plotter.
    init : function(){
        
-      // enhance the headers behaviour.
+      // enhance the  behaviour of the header navi.
       PLTR.header.init(); 
 
       // assign sesible defaults to all ajax-calls.
       jQuery.ajaxSetup(PLTR.conf.jquery_ajax_defaults);
 
       // bind events
-      $(PLTR.conf.selectors.eventhook).bind(PLTR.conf.events.onDatesLoad, PLTR.dates.render);
+      $(PLTR.conf.selectors.eventhook).bind(PLTR.conf.events.onDatesLoad,function(){
+          PLTR.dates.render(); 
+      });
+      $(PLTR.conf.selectors.eventhook).bind(PLTR.conf.events.onDatesLoad, function(){ PLTR.log('dates loaded event');});
 
    }
 };  // end of PLTR;

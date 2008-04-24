@@ -253,7 +253,7 @@ class Date(models.Model):
         date_hierarchy = 'startdate'
         fields = (
           (None, {'fields': ('startdate','starttime','enddate','summary','slug',)}),
-          (None, {'fields': ('description', 'organizer', 'location')}),
+          (None, {'fields': ('description', 'organizer', 'location', 'adress')}),
           (None, {'fields': ('publish', 'category', 'allowcomments')}),
           #('Webinfo', {'fields': ('webresources',)}),
         )
