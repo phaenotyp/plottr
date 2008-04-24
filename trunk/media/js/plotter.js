@@ -140,7 +140,7 @@ var PLTR = {
         // gets a list of dates from the server and fires onDatesLoad event.
         if( PLTR.dates._validate_query(query) ){ // validate the query
            var url = PLTR.dates._query_url(query);
-           $(PLTR.conf.selectors.eventhook).trigger(PLTR.conf.events.beforeDatesLoad); // trigger event.
+           PLTR.events.trigger('beforeDatesLoad'); // trigger event.
            // make an xhr to get dates as json
            $.ajax({
               url: url,
@@ -152,7 +152,7 @@ var PLTR = {
                     PLTR.dates.db.insert(value); 
                  });
                  // trigger an event
-                 $(PLTR.conf.selectors.eventhook).trigger(PLTR.conf.events.onDatesLoad);
+                 PLTR.events.trigger('onDatesLoad');
               }
            });
         } else { // query object was invalid.
@@ -214,6 +214,11 @@ var PLTR = {
    // infobar gives status reports of the application to the user. like 'saved successfuly', 'loading' or 'connection lost'
    // could also be used to broadcast to all clients from the server.
    infobar : {
+       init : function(){
+          $(PLTR.conf.selectors.infobar_container).click(function(){
+             $(PLTR.conf.selectors.infobar_msg).empty();  
+          });
+       }, 
        message : function(msg){
           // displays an info-message
           $(PLTR.conf.selectors.infobar_msg).text(msg)
@@ -221,8 +226,15 @@ var PLTR = {
        },
        error : function(msg){
           // displays an error-message
-          $(PLTR.conf.selectors.infobar).text(msg).show();
+          $(PLTR.conf.selectors.infobar_msg).text(msg);
+          $(PLTR.conf.selectors.infobar_container).show();
        },
+       warning : function(msg){
+          // displays an error-message
+          $(PLTR.conf.selectors.infobar_msg).text(msg);
+          $(PLTR.conf.selectors.infobar_container).show();
+       },
+ 
        poll_server : function(msg){
           // checks server for messages and displays them
        },
@@ -264,6 +276,28 @@ var PLTR = {
       zoom_to : function( dateid ){
       }
    },
+   events : {
+      _get : function(e){ 
+         // this function takes a name of an event and returns the event-string
+         // makes it possible to call
+         // PLTR.events.trigger('onDatesLoad');  instead of
+         // PLTR.events.trigger(PLTR.conf.events.onDatesLoad); 
+         for (attr in PLTR.conf.events){
+             if(attr == e) return PLTR.conf.events[attr]; 
+             if(PLTR.conf.events[attr] == e) return e; 
+         } 
+         PLTR.infobox.warning('No Event ' + e + ' defined.' );  
+         return e;
+      },
+      bind : function( e, f ){
+         // bind a function to an event 
+        $(PLTR.conf.selectors.eventhook).bind(PLTR.events._get(e),f);
+      }, 
+      trigger : function( e ){
+         // triggers an event 
+         $(PLTR.conf.selectors.eventhook).trigger(PLTR.events._get(e));
+      }, 
+   },
    // makes a copy of an object
    // usage:
    // var newob = new PLTR.clone(oldob);
@@ -281,18 +315,20 @@ var PLTR = {
    },
    // initialises Plotter.
    init : function(){
-       
+      // call individual init functions.
+      // TODO: think about iterating over all first level members of PLTR 
+      // and executing each init()  
       // enhance the  behaviour of the header navi.
       PLTR.header.init(); 
+      // enhance the  behaviour of the header navi.
+      PLTR.infobar.init(); 
 
       // assign sesible defaults to all ajax-calls.
       jQuery.ajaxSetup(PLTR.conf.jquery_ajax_defaults);
 
       // bind events
-      $(PLTR.conf.selectors.eventhook).bind(PLTR.conf.events.onDatesLoad,function(){
-          PLTR.dates.render(); 
-      });
-      $(PLTR.conf.selectors.eventhook).bind(PLTR.conf.events.onDatesLoad, function(){ PLTR.log('dates loaded event');});
+      PLTR.events.bind('onDatesLoad', function(){ PLTR.dates.render(); });
+      PLTR.events.bind('onDatesLoad', function(){ PLTR.log('dates loaded event');});
 
    }
 };  // end of PLTR;

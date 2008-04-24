@@ -37,7 +37,7 @@
 /* desgin */ 
 
 
-
+/* head navigation */
 ul#headnavi {
   position:absolute;
   right:2em;
@@ -76,7 +76,19 @@ li#login input {
    left:-210px;
 }
 
+/* navigation ( query-editor ) */ 
 
+
+
+/* infobar */
+div#infobar {
+   padding:4px;
+}
+
+
+div#infobar.error {
+   border: 1px solid red;  
+}
 /* colors */ 
 
 body {
