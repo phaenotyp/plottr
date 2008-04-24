@@ -61,12 +61,41 @@
        assertFalse(PLTR.isArray(na3));
     } 
 
+    function testRenderone(){
+        PLTR.conf.date_template = 'My name is {{ name }}.';
+        var context = { name : 'Harold' }; 
+        PLTR.dates.renderone(context, '#secondary');   
+        assertEquals('My name is Harold.', $('#secondary').text());
+        
+    } 
+
+    function testEventsGet(){
+       // test the function that lets you call events by name.
+       assertEquals('Call event by shortname',PLTR.events._get('onDatesLoad'),'onDatesLoad');   
+       assertEquals('call event by long namespace',PLTR.events._get(PLTR.conf.events.onDatesLoad),'onDatesLoad');   
+    }
+  
+
     function testTemplate(){ 
         // tests the mini-template engine of plotter
         var template = 'My name is {{ name }}.';
         var context = { name : 'Harold' }; 
         assertEquals('My name is Harold.', PLTR.template.render(template, context));
         
+    }
+
+    function testClone(){ 
+      // test the function PLTR.clone
+      var obj1 = { prop : '1'  };
+      var ref1 = obj1;
+      assertEquals( 'referens == original', obj1, ref1 );  
+      ref1.prop = 2;
+      assertEquals( 'changed reference and original', obj1, ref1 );  
+      var cpy1 = new PLTR.clone( obj1 ); 
+      assertEquals( 'clone == original', obj1.prop, cpy1.prop );  
+      cpy1.prop = 3; 
+      assertNotEquals( 'changed clone', obj1.prop, cpy1.prop );
+
     }
 
     function testInfobar() {
