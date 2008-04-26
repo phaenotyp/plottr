@@ -78,7 +78,11 @@ body.dynamic .headnavi_cont {
 
 /* navigation ( query-editor ) */ 
 body.dynamic div#navi form.fallback {
-   display:none;
+   /* display:none; */
+}
+
+form.fallback ul>li {
+  display:inline;    
 }
 
 div#navi {
