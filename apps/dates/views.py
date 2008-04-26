@@ -6,14 +6,45 @@ from django.http import HttpResponse, HttpResponseRedirect
 from plotter.apps.dates.models import Date
 from plotter.utils import json_encode
 from datetime import datetime, timedelta
+from django import newforms as forms
 
-def redirect( request ): 
-    url = '/dates/' 
-    url += request.GET.get('date', '2008') + '/'
-    url += request.GET.get('country', 'de') + '/'
-    if request.GET.has_key('zip'): url += request.GET['zip'] + '/'
-    return HttpResponseRedirect(url) 
-     
+
+#  this is the form, that is displayed when javascript is not activated.
+class QueryFallbackForm(forms.Form):
+    date = forms.CharField(max_length=10, required=False)
+    country = forms.ChoiceField( required=False, choices=(('de','de'), ('none','keins')))
+    zips = forms.CharField(required=False)
+
+    #def clean_zips():
+
+    def get_url(self):
+        if self.is_valid():
+            url = '/dates/'
+            if self.cleaned_data['date']:
+                url += self.cleaned_data['date'] + '/'
+                if self.cleaned_data['date']:
+                    url += self.cleaned_data['country'] + '/'
+                    if self.cleaned_data['zips']:
+                        url += self.cleaned_data['zips'] + '/'
+            return url
+        else:
+            raise  ValueError, 'Invalid Data in QueryFallbackForm'
+
+#  takes a request with the parametera
+#  date, country, zips 
+#  and redirects to the corresponding url
+def redirect( request ):
+    form = QueryFallbackForm(request.REQUEST)
+    try:
+        return HttpResponseRedirect(form.get_url())
+    except ValueError:
+        return object_list(
+           request,
+           queryset = Date.objects.published(),
+           template_name='dates/list.html',
+           template_object_name='dates',
+           extra_context={'queryfallbackform': form,'erro': 'No Matching Dates.' },
+        )
 
 # the views that retrn a single date.
 def single_response(request, date):
@@ -25,7 +56,7 @@ def single_response(request, date):
         return  HttpResponse(date.as_json(), mimetype='application/json')
 
     if request.accepts('text/html'):
-        return render_to_response('dates/single.html', {'object': date})
+        return render_to_response('dates/single.html', {'object': date, 'queryfallbackform': QueryFallbackForm()})
 
 def single(request, year, month, day, country, zipcode, slug):
     """One single date.
@@ -45,7 +76,7 @@ def single_by_id(request, id):
   
 
 def date_list(request):
-    """ a list of dates
+    """ a list of all dates
     """
     if request.accepts('application/json'):    
         dates = Date.objects.published()  
@@ -58,12 +89,13 @@ def date_list(request):
 
     if request.accepts('text/html'):
         # using the generic view with custom parameters
-        return object_list(   
+        return object_list(
            request,
            queryset = Date.objects.published(),
            template_name='dates/list.html',
-           template_object_name='dates'
-        )     
+           template_object_name='dates',
+           extra_context = {'queryfallbackform': QueryFallbackForm()},
+        )
 
 #TODO check if the following funtions can be reasonably refactored 
 def by_date(request, date):
@@ -87,7 +119,8 @@ def by_date(request, date):
            request,
            queryset = dates,
            template_name='dates/list.html',
-           template_object_name='dates'
+           template_object_name='dates',
+           extra_context ={'queryfallbackform': QueryFallbackForm({'date':date})},
         )     
 
 def by_place(request, date, country, zipcode=None):
@@ -124,7 +157,8 @@ def by_place(request, date, country, zipcode=None):
            request,
            queryset = dates,
            template_name='dates/list.html',
-           template_object_name='dates'
+           template_object_name='dates',
+           extra_context ={'queryfallbackform': QueryFallbackForm({'date': date, 'country': country, 'zips': zipcode})},
         )
 
 
@@ -140,15 +174,16 @@ def _by_place(request, date, country, zip=None):
             d.absolute_url = d.get_absolute_url() 
             d.adressdata = d.adress
             d.locationdata = d.location
-        return  HttpResponse(json_encode(dates), mimetype='application/json') 
- 
+        return  HttpResponse(json_encode(dates), mimetype='application/json')
+
     if request.accepts('text/html'):
         # using the generic view with custom parameters
         return object_list(   
            request,
            queryset = dates,
            template_name='dates/list.html',
-           template_object_name='dates'
+           template_object_name='dates',
+           extra_context = {'queryfallbackform': QueryFallbackForm()},
         )     
 
 
@@ -158,8 +193,3 @@ def by_geo(request, date, geo, distance):
     """ 
     # wickedness
     pass
-
-
-
-
-
