@@ -5,7 +5,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 from plotter.apps.dates.models import Date
 from plotter.utils import json_encode
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta 
+from datetime import date as ddate
 from django import newforms as forms
 
 
@@ -16,6 +17,9 @@ class QueryFallbackForm(forms.Form):
     zips = forms.CharField(required=False)
 
     #def clean_zips():
+
+    #def clean_date():
+    #   ddate( ) 
 
     def get_url(self):
         if self.is_valid():
@@ -102,8 +106,6 @@ def by_date(request, date):
     """ a list of dates, matching the parameter date
         /dates/2009-12-23/
     """
-    
-
     dates = Date.objects.by_date(date)  
     if request.accepts('application/json'):    
         for d in dates:
@@ -135,6 +137,8 @@ def by_place(request, date, country, zipcode=None):
         # if several zipcodes are passed, seperated by commata
         if ',' in zipcode:
            zips = zipcode.split(',')
+           #TODO this needs rewriting. 
+           # not before queryset-refactor hits trunk
            dates = dates.filter(adress__zipcode__in=zips)
         # if a single or partial zipcode is passed
         else:
@@ -160,32 +164,6 @@ def by_place(request, date, country, zipcode=None):
            template_object_name='dates',
            extra_context ={'queryfallbackform': QueryFallbackForm({'date': date, 'country': country, 'zips': zipcode})},
         )
-
-
-
-def _by_place(request, date, country, zip=None):
-    """ a list of dates, matching the parameter date and place
-        /dates/2009-12-23/de-52123/
-    """
-    print 'place and date'
-    dates = Date.objects.by_date_and_place(date, country, zip)
-    if request.accepts('application/json'):    
-        for d in dates:
-            d.absolute_url = d.get_absolute_url() 
-            d.adressdata = d.adress
-            d.locationdata = d.location
-        return  HttpResponse(json_encode(dates), mimetype='application/json')
-
-    if request.accepts('text/html'):
-        # using the generic view with custom parameters
-        return object_list(   
-           request,
-           queryset = dates,
-           template_name='dates/list.html',
-           template_object_name='dates',
-           extra_context = {'queryfallbackform': QueryFallbackForm()},
-        )     
-
 
 def by_geo(request, date, geo, distance):
     """Dates filtered by geocoordinates

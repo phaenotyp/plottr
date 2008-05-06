@@ -1,138 +1,314 @@
+/* reset-stuff */
+* { margin:0; padding:0; } 
 
-
-/* layout */ 
-#content,  #header, #navi, #infobar{
-   width:920px;
-   position:relative;
-   margin:4px 0pt 4pt 4px;
+ul, ol { 
+  list-style:none;
 }
 
+input { 
+  border:1px solid black; 
+}
 
+body { font-family:verdana,sans-serif; } 
+
+.clear { clear:both; display:block; } 
+
+/* layout -------------------------------------------------------------------- */
+
+/* 
+ * css in this section should just target elements in structure.html 
+ *   
+ * The layout is liquid and has  two content-collums. 
+ * Positioning is done mainly with the 'position'-attribute.
+ *
+ * */
+
+
+#hair, #container, #footer {
+   min-width: 740px;
+   max-width: 1200px;
+}
+
+#header, #content, #footer {
+   position : relative;
+}
+
+/* the header */
+
+/* 
+ * The header contains two structural items, the logo-container to the left
+ * and a navigation to the right.  both are absolutely positioned.
+ * */
 #header {
-   height:140px;
+  height : 11em;
 }
+
+#logocontainer {
+   position : absolute;
+   left : 0;
+   width : 40%;
+}
+
+#headnavicontainer {
+   position : absolute;
+   right : 0;
+   width : 60%;
+}
+
+/* the content area */
 
 #content {
- /*  min-height:400px; */
+   min-height:200px;
 }
 
-#primary, #secondary {
-   position:absolute;
-   min-height:400px;
-  /* top:130px; /* height of #header +10 */ 
-} 
-
 #primary {
-   left:4px;
-   width:650px;
+  /* position : absolute;
+   left : 0; */
+   float:left;
+   width : 60%;
 }
 
 #secondary {
-  /* left:596px; */
-   right:0px;
-   width:250px;
+  /* position : absolute;
+   right : 0; */
+   float:right;
+   width : 40%;
+}
+
+/* socks are sub-containers, they prevent the structural layout container from 
+ * changing the size when changing padding or margins or the like.
+ */
+.sock {
+   margin: 0 auto;
+   width : 90%;
 }
 
 
-/* desgin */ 
-
+/* positions & sizes -------------------------------------------------------- */
 
 /* head navigation */
-ul#headnavi {
-  position:absolute;
-  right:2em;
-  top:4px;
-}
-ul#headnavi>li, ul#headnavi ul {
-   display:inline;
-}
-
-ul#headnavi>li>ul>li {
-   display:inline;
-}
-ul#headnavi h3 {
- font-size:1.2em;   
-}
-
-li#login label {
-  display:inline;
-}
-li#login input {
-  display:block;   
-  border:1px solid #C8F775;
-  font-size:0.8em;
-  padding:0;
-
-}
-
-.headnavi_cont {
-   width : 200px;
+/* head navigation is styled here but a lot of styles will be overridden 
+ * in the dynamics-section below */
+ul#headnavi>li {
+  float:left;
+  width:12em;
 }
 
 
-body.dynamic .headnavi_cont {
-   position:absolute;
-   top:0px;
-   left:-210px;
-}
-
-/* navigation ( query-editor ) */ 
-body.dynamic div#navi form.fallback {
-   /* display:none; */
-}
-
-form.fallback ul>li {
-  display:inline;    
-}
-
-div#navi {
-   border:1px solid #A6E553;
-   padding:4px;
-   height:80px;
-}
-
-div#navi div#dataset-description {
-  display:block;
-  font-size:1.2em;
-}
-div#navi>.widget {
-   float:left;
-   display:block;
-   border: 1px solid blue;
-   padding: 4px;
-}
-
-div#navi .selection{
+/* query editor (main navigation) ------------- */
+div#queryeditor {
    display:none;
 }
 
 
-/* infobar */
-div#infobar {
-   padding:4px;
+div#queryeditor>div#qe_interface>* {
+  display:inline;
+}
+
+div#queryeditor>div#qe_interface>span {
+  cursor:pointer;
+}
+
+/* query editor ziplist */
+/* styling of the ul displaying the selected zipcodes */
+div#queryeditor ul#navi_zips_display>li {
+  display:inline;
+}
+div#queryeditor ul#navi_zips_display>li>span.removezip {
+   visibility:hidden;
+}
+div#queryeditor ul#navi_zips_display>li:hover {
+   cursor:pointer;
+}
+div#queryeditor ul#navi_zips_display>li:hover span.removezip {
+   visibility:visible;
 }
 
 
-div#infobar.error {
-   border: 1px solid red;  
+/* boxes - secondary content */ 
+
+div.box {
+   padding: 5px 20px;
+   margin : 1em;
 }
-/* colors */ 
+
+
+/* date list ---------------------------- */
+ul#dates>li {
+  clear:both;
+  margin : 4px;
+}
+
+
+ul#dates>li>div {
+  float:left; 
+}
+
+ul#dates div.dtstart>*, ul#dates .location, ul#dates .summary {
+  display:block;
+}
+
+ul#dates div.dtstart{
+  width:4em;
+  text-align:center;
+  margin-right: 1em;
+}
+ul#dates div.dtstart>*{
+   margin: auto auto;
+}
+
+/* dynamic changes --------------------------------------------------------- */
+
+/* don't show elements with the clas of fallback, because the are non-js fallback */
+
+body.dynamic .fallback {
+   display : none;
+}
+
+/* header navigation */
+body.dynamic ul#headnavi{
+  position:absolute;
+  right:0;
+}
+body.dynamic ul#headnavi>li {
+  float:none;
+  text-align:right;
+}
+body.dynamic .headnavi_items {
+   position:absolute;
+   top:0;
+   left:-7em; 
+   width:12em;
+   text-align:left;
+   display:none;
+}
+
+/* query editor (main navigation) */
+body.dynamic div#queryeditor {
+   display:block;
+}
+
+body.dynamic div#queryeditor>.widget {
+   display:none;
+}
+
+
+/* colors, borders and stuff ------------------------------------------------ */
 
 body {
-    background:#21689F none repeat scroll 0%;
-    color:#A6E553;
+ margin : 10px;
+ background : #FFF;
 }
 
-ul#headnavi>li>ul>li>a {
-   color:#C8F775;
-   text-decoration:none;
+div#container {
+  background: #EEE;
 }
 
-div#header h1 {
+div#infobar {
+  background: #666;
+  padding: 0.3em;
+}
+
+div#infobar.error  {
+  background: #DD6666;
+}
+
+div#infobar.warning, div#infobar.message  {
+  background: yellow;
+}
+div#navi{
+  background: #CECECE;
+}
+
+/* query editor --------------- */
+div#queryeditor>.widget {
+   color:#000;
+   border: 1px solid black;
+   padding: 4px;
+   background-color:#FFF;
+}
+
+
+
+
+/* the black box displaying on hover is supposed to 
+ * give the idea of an edit field. intuitive and things. 
+ */ 
+div#queryeditor ul#navi_zips_display>li span.zip:hover {
+   border:1px solid black;
+}
+/* if there is no border without the hovering, there is a small jump on hover */
+div#queryeditor ul#navi_zips_display>li span.zip {
+   border:1px solid #CEEECE;
+}
+
+/* highlight selections on-over */
+/* list inside widgets */
+div#queryeditor>.widget ul>li:hover {   
+   background:#0F0;
+}
+
+/* ziplist */
+div#queryeditor ul#navi_zips_display>li{
+   padding:1px;
+   background: #CEEECE;
+   margin:2px;
+}
+
+
+/* date-list ------------------- */
+
+ul#dates>li.odd {
+   background: #CECECE;
+}
+
+ul#dates div.dtstart span.day {
    font-size:2em;
 }
 
+ul#dates a {
+   text-decoration:none;
+   color:black;
+}
 
-#primary, #header, #secondary {
-    border:1px solid #A6E553;
+ul#dates a.summary { 
+   font-size:1.5em;
+}
+
+ul#dates div.dtstart {
+   border:1px solid black;
+}
+
+/* date-list selected item  */
+ul#dates>li.selected {
+   background: #121212;
+   color: #A84;
+   padding:4px;
+}
+
+ul#dates>li.selected a {
+   color: #A84;
+}
+
+ul#dates>li.selected div.dtstart {
+   border:1px solid #A84;
+} 
+
+
+/* boxes in the secondary */
+div.box {
+   background : #dedede;
+}
+
+div.box>h2 {
+  font-size:1em;
+  padding:2px 4px;
+  background : #CEEECE;
+  margin-top : 0.5em;
+  margin-bottom: 0.9em;
+} 
+
+div.box>div {
+  padding:2px 4px;
+  background : #EEE;
 }
