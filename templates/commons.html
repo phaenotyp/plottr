@@ -1,0 +1,59 @@
+{% extends "structure.html" %} 
+
+{% block headnavi %} 
+        <ul id="headnavi">
+        <li id="about">
+          <h3>About</h3>
+          <ul class="headnavi_items">
+             <li><a href="/about/">plottr</a></li>
+             <li><a href="/about/impressum/">impressum</a></li>
+             <li><a href="/about/team/">team</a></li>
+          </ul>
+          <li id="participate">
+          <h3>Participate</h3>
+          <ul class="headnavi_items">
+             <li><a href="/dates/submission/">Termin vorschlagen</a></li>
+             <li><a href="http://code.plottr.de/">Open Source</a></li>
+             <li><a href="/contact/">Contact</a></li>
+          </ul>
+          <li id="login">
+          <h3>Login</h3>
+          <div class="headnavi_items">
+            <form name="login" method="post">
+              <label for="login">Login:</label><input type="text" name="login" />
+              <label for="password">Pass:</label<input type="password" name="password" />
+              <input type="submit" />
+              <p>Neue Logins werden zur Zeit nur <a href="/contact/">pers&ouml;nlich</a> ausgegeben.</p>
+            </form>
+          </div>
+       </li>
+      </ul>
+{% endblock %}
+
+{% block navi %} 
+ <!-- <div id="dataset-description">Alle Termine von heute in Bonn-Altstadt</div>-->
+     <!-- this is the fallback form in case js is turned off -->
+      <form name="navi_fallback_form" class="fallback" method="get" action="/dates/redirect/">
+      <ul>{{ queryfallbackform.as_ul }}<li><input type="submit" value="query" /></li></ul>
+      </form>
+
+<div id="queryeditor">
+   <div id="qe_interface">
+      <span id="navi_date_display">all</span> 
+      <span id="navi_country_display">de</span> 
+      <ul id="navi_zips_display"></ul>
+      <span id="navi_submit">submit</span>
+   </div>
+
+       <!-- the widgets aren't displayed unless the user action action -->
+      <div class="widget" id="navi_date">
+      <h2>Zeitraum</h2>
+      <ul id="navi_date_options">
+         <li title="all">All</li>
+         <li title="today">Today</li>
+         <li title="tomorrow">Tomorrow</li>
+         <li id="nav_date_option_input"><input type="text" id="navi_date_input" /></li>
+      </ul>
+      </div>
+</div>
+{% endblock %}
