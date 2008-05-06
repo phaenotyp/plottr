@@ -1,4 +1,4 @@
-#summary Desctipion of the file local_setting.py
+﻿#summary Desctipion of the file local_setting.py
 #labels Phase-Deploy,Phase-Implementation
 
 = local_settings.py =
@@ -31,3 +31,5 @@ ADMINS = (
 
 MANAGERS = ADMINS
 }}} 
+
+LOCAL_MEDIA is the path to the directory under subversion trunk/media/ 

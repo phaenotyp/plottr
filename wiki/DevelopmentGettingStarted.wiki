@@ -1,4 +1,4 @@
-#summary A short guide on how to install a development version.
+﻿﻿#summary A short guide on how to install a development version.
 #labels Phase-Implementation,Featured
 
 =Getting Started=
@@ -36,6 +36,11 @@ There are a couple more things to do.
 
   * Make sure you got all the packages mentioned in [Dependencies] on your System.
 
-  * Start the Development Server {{{ python ./manage.py runserver }}}.
+  * Create the Database-Tables  {{{ python ./manage.py synchdb }}}.
+
+  * Start the Development Server {{{ python ./manage.py runserver 2701 }}}.
 
   * Point your browser to http://127.0.0.1:2701/ 
+
+
+  

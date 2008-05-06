@@ -1,4 +1,4 @@
-#summary A unordered list of possible future features.
+﻿#summary A unordered list of possible future features.
 #labels Phase-Design
 
 = Feature Brainstorming=
@@ -6,7 +6,7 @@
   * webinterface
   * import from ical (google/outlook), hCalendar,  rss, ical, csv, email?
   * export to ical
-  * interface with scial networks?  maybe possible via ical?
+  * interface with social networks?  maybe possible via ical?
   * mapping
   * feeds per: location/area, organizer, area, owner  
   * pdf-export for making plotter leaflets.
