@@ -1,14 +1,23 @@
 {% extends "base.html" %}
 
 {% block primary %}
-<h1>All Dates</h1>
 <ul id="dates">
 {% for dt in dates_list %}
-  <li><a href="{{ dt.get_absolute_url  }}">{{ dt.summary }}</a></li>
-  
-
-
-
+  <li class="vevent {% cycle odd,even %}" id="date_{{ dt.id }}">
+    <div class="dtstart" title="{{ dt.startdatetime|date:"Y-m-d\Th:i:s"}}">
+       <span class="month">{{ dt.startdatetime|date:"F" }}</span>
+       <span class="day">{{ dt.startdatetime|date:"d" }}</span>
+       <span class="year">{{ dt.startdatetime|date:"Y" }}</span>
+    </div>
+    <div>
+      <a class="location">{{ dt.location }}<a/> 
+      <a class="summary url" href="{{ dt.get_absolute_url  }}">{{ dt.summary }}</a>
+    </div> 
+    <span class="clear"></span>
+  </li>
 {% endfor %}
 </ul>
+<span class="clear"></span>
 {% endblock %}
+
+
