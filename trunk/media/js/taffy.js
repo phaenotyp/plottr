@@ -4,7 +4,7 @@ Software License Agreement (BSD License)
 http://taffydb.com
 Copyright (c) 2008
 All rights reserved.
-Version 1.2
+Version 1.4
 
 
 Redistribution and use of this software in source and binary forms, with or without modification, are permitted provided that the following condition is met:
@@ -19,23 +19,17 @@ SUMMARY:
 TAFFY takes a JavaScript object and returns a set of methods
 to search, modify, and manipulate that object.
 
-
-* TODO: OR handling in find methods?
-* TODO: Optional Indexes?
-* TODO: some() check? (some records match the find filter, true/false)
-* TODO: every() check? (all records match the find filter, true/false)
-
-
 */
 
 
 // Setup TAFFY Function (nameSpace) to return an object with methods. 
 
-if (!this.TAFFY) {
+if (!window.TAFFY) {
 
 TAFFY = function (obj) {
 	var raw = (TAFFY.isString(obj)) ? TAFFY.JSON.parse(obj) : obj;
-   	var TAFFYObj = raw;
+   	var TOb = raw;
+	var t = true, f=false;
 	
 	// ****************************************
     // *
@@ -51,13 +45,59 @@ TAFFY = function (obj) {
 	// * the TAFFY Object record to the results set.
     // *
     // ****************************************
-    
-	var t = true, f=false;
 	
-	
-	var findTests = {
+							var findTests = {
 								
-								regexppass:function (mvalue,mtest)
+								pickTest:function(Tt)
+								{
+								var mT;
+								switch (Tt) {
+                                case 'equal' :
+								case 'is' :
+									mT = 'is';
+								break;
+								
+								case 'notequal' :
+								case 'not' :
+									mT = 'not';
+								break;
+								
+                                case 'startswith' :
+								case 'starts' :
+									mT = 'starts';
+								break;
+                                case 'endswith' :
+								case 'ends' :
+									mT = 'ends';
+								break;
+                                case 'greaterthan' :
+								case 'gt' :
+									mT = 'gt';
+								break;
+                                case 'lessthan' :
+								case 'lt' :
+									mT = 'lt';
+								break;
+								case 'regexppass' :
+								case 'regex' :
+									mT = 'regex';
+								break;
+								case 'regexpfail' :
+									mT = 'regexpfail';
+								break;
+                                case 'arraycontains' :
+								case 'contains' :
+									mT = 'contains';
+								break;
+                                default :
+                                    // default to exact if it doesn't match anything else
+                                    mT = Tt;
+                                break;
+                            }
+								return mT;
+								},
+								
+								regex:function (mvalue,mtest)
 								{
 									// If a value matches a provided regular expression
 									return (mtest.test(mvalue)) ? t : f;
@@ -67,22 +107,22 @@ TAFFY = function (obj) {
 									// If a value does not match a provided regular expression
 									return (!mtest.test(mvalue)) ? t : f;
 								},
-								lessthan:function (mvalue,mtest)
+								lt:function (mvalue,mtest)
 								{
 									// If a value is less than a provided number
 									return (mvalue < mtest) ? t : f;
 								},
-								greaterthan:function (mvalue,mtest)
+								gt:function (mvalue,mtest)
 								{
 									// if a value is greater than a provided number
 									return (mvalue > mtest) ? t : f;
 								},
-								startswith:function (mvalue,mtest)
+								starts:function (mvalue,mtest)
 								{
 									// If a value starts with a provided string
 									return (mvalue.indexOf(mtest) === 0) ? t : f;
 								},
-								endswith:function (mvalue,mtest)
+								ends:function (mvalue,mtest)
 								{
 									// If a value ends with a provided string
 									return (mvalue.substring((mvalue.length - mtest.length)) == mtest) ? t : f;
@@ -97,17 +137,29 @@ TAFFY = function (obj) {
 									// If a value does not contain a provided substring
 									return (mvalue.indexOf(mtest) === -1) ? t : f;
 								},
-								equal:function (mvalue,mtest)
+								is:function (mvalue,mtest)
 								{
 									// If a value and a provided string or number are equal
 									return (mvalue == mtest) ? t : f;
 								},
-								notequal:function (mvalue,mtest)
+								not:function (mvalue,mtest)
 								{
 									// If a value and a provided string or number are not equal
-									return (mvalue != mtest) ? t : f;
+									switch (TAFFY.typeOf(mtest))
+									{
+										case "object" :
+											return (!TAFFY.isSameObject(mvalue,mtest)) ? t : f;
+										break;
+										case "array" :
+											return (!TAFFY.isArray(mvalue) || mvalue.join(",") != mtest.join(",")) ? t : f;
+										break;
+										default :
+											return (mvalue != mtest) ? t : f;
+										break;
+									}
+									
 								},
-								arraycontains:function (mvalue,mtest)
+								contains:function (mvalue,mtest)
 								{
 									 // If a provided value is found within an array of values
 									
@@ -130,10 +182,35 @@ TAFFY = function (obj) {
                                     }
 									// If nothing has returned true by this point, return false.
 									return f;
-								}
-								
+								},
+								length:function (mvalue,mtest)
+								{
+									var rlen = (!TAFFY.isUndefined(mvalue.length)) ? mvalue.length : 0;
+									if (TAFFY.isObject(mtest)) {
+										for(var kt in mtest)
+										{
+											return findTests[kt](rlen,mtest[kt]);
+										}
+									} else {
+										return (rlen == mtest) ? t : f;
+									}
+								}								
 								};
 	
+	// Add in isObjectType checks
+	(function (ts) {
+		for(var z = 0;z<ts.length;z++)
+		{
+			(function (y) {
+				findTests["is" + y] = function (mvalue,mtest) {
+					return (TAFFY["is" + y](mvalue) == mtest) ? t : f;
+				}
+				findTests["isNot" + y] = function (mvalue,mtest) {
+					return (!TAFFY["is" + y](mvalue) == mtest) ? t : f;
+				}
+			}(ts[z]))
+		}
+	} (["String","Number","Object","Array","Boolean","Null","Function","Undefined","Numeric","SameArray","SameObject"])); 
 	
 	// ****************************************
     // *
@@ -169,7 +246,7 @@ TAFFY = function (obj) {
 		   }
 		else if (!TAFFY.isArray(iA) && !TAFFY.isNumber(iA))
            {
-                for(var miAd = 0; miAd < TAFFYObj.length; miAd++) {
+                for(var miAd = 0; miAd < TOb.length; miAd++) {
                     rA[rA.length] = miAd;
                 }
                     
@@ -193,7 +270,7 @@ TAFFY = function (obj) {
 		for(var n = 0;n<value.length;n++)
 		{
 			var c = value.slice(n,(n+1));
-			if (TAFFY.IsNumeric(c)) {
+			if (TAFFY.isNumeric(c)) {
 				if (type != 'number') {
 					rArray[rArray.length] = c;
 					type = 'number';
@@ -212,7 +289,7 @@ TAFFY = function (obj) {
 		}
 		for(var n = 0;n<rArray.length;n++)
 		{
-			if (TAFFY.IsNumeric(rArray[n])) {
+			if (TAFFY.isNumeric(rArray[n])) {
 				rArray[n] = parseFloat(rArray[n]);
 			}
 		}
@@ -248,7 +325,7 @@ TAFFY = function (obj) {
             for(var sa = 0; sa < localO.length; sa++) {
                 if (TAFFY.isString(localO[sa]))
                     {
-                    if (TAFFY.isString(TAFFYObj[0][localO[sa]]))
+                    if (TAFFY.isString(TOb[0][localO[sa]]))
                         {
                             custO[custO.length] = {sortCol : localO[sa], sortDir : "asc", type : "string"};
                         } else {
@@ -258,7 +335,7 @@ TAFFY = function (obj) {
 						for(var sc in localO[sa])
 						{
 						
-                        	if (TAFFY.isString(TAFFYObj[0][localO[sa].sortCol]))
+                        	if (TAFFY.isString(TOb[0][localO[sa].sortCol]))
                         	{
                             	custO[custO.length] = {sortCol : sc, sortDir : localO[sa][sc], type : "string"};
                         	} else {
@@ -372,7 +449,7 @@ TAFFY = function (obj) {
     // * This is the length of the current TAFFY Obj.
     // *
     // ****************************************
-    length:TAFFYObj.length,
+    length:TOb.length,
 
     
 	// ****************************************
@@ -388,7 +465,7 @@ TAFFY = function (obj) {
     // * Create public find method
     // * Returns array of index numbers for matching array values
     // * Purpose: This takes an obj that defines a set of match
-    // * cases for use against the TAFFYObj. Matching indexes are
+    // * cases for use against the TOb. Matching indexes are
     // * added to an array and then returned to the user. This is the
     // * primary "lookup" feature of TAFFY and is how you find individual
     // * or sets of records for use in update, remove, get, etc.
@@ -404,7 +481,7 @@ TAFFY = function (obj) {
         for (var mi in matchObj){ 
         
             // default matchType, matchValue, matchField
-            var matchType = 'equal',matchValue = '',matchField = mi;
+            var matchType = 'is',matchValue = '',matchField = mi;
 			
             // If the matchObj attribute is an object
             if (TAFFY.isObject(matchObj[mi]))
@@ -413,56 +490,8 @@ TAFFY = function (obj) {
                 for (var fi in matchObj[mi]){ 
                     
                     // switch over attributes, extract data
-                    switch (fi) {
-                                case 'equal' :
-								case 'is' :
-									matchType = 'equal';
-								break;
-								
-								case 'notequal' :
-								case 'not' :
-									matchType = 'notequal';
-								break;
-								
-                                case 'startswith' :
-								case 'starts' :
-									matchType = 'startswith';
-								break;
-                                case 'endswith' :
-								case 'ends' :
-									matchType = 'endswith';
-								break;
-                                case 'greaterthan' :
-								case 'gt' :
-									matchType = 'greaterthan';
-								break;
-                                case 'lessthan' :
-								case 'lt' :
-									matchType = 'lessthan';
-								break;
-								case 'regexppass' :
-								case 'regex' :
-									matchType = 'regexppass';
-								break;
-								case 'regexpfail' :
-									matchType = 'regexpfail';
-								break;
-                                case 'arraycontains' :
-								case 'contains' :
-									matchType = 'arraycontains';
-								break;
-                                case 'like' :
-								 case 'notlike' :
-								
-                                   matchType = fi;
-                                break;
-                                default :
-                                    // default to exact if it doesn't match anything else
-                                    // FEATUREADD: This should fail instead.
-                                    matchType = 'equal';
-                                break;
-                            }
-                    
+					matchType = findTests.pickTest(fi);
+
       				matchValue = matchObj[mi][fi];
                 }
             }
@@ -482,7 +511,7 @@ TAFFY = function (obj) {
 					if (TAFFY.isArray(findFilter)) {
 						findMatches = findFilter;
 					} else  {
-                    	for(var fd = 0; fd < TAFFYObj.length; fd++) {
+                    	for(var fd = 0; fd < TOb.length; fd++) {
                         	findMatches[findMatches.length] = fd;
                     	}
 					}
@@ -498,11 +527,11 @@ TAFFY = function (obj) {
                        for(var d = 0; d < findMatches.length; d++) {
 					   	
                                     // if the value is an array of values, loop rather than do 1 to 1
-                                    if (TAFFY.isArray(matchValue))
+                                    if (TAFFY.isArray(matchValue) && matchType != 'isSameArray')
                                     {
 										// call the correct filter based on matchType and add the record if the filter returns true
                                         for(var md = 0; md < matchValue.length; md++) {
-                                            if (findTests[matchType](TAFFYObj[findMatches[d]][matchField],matchValue[md])) {
+                                            if (findTests[matchType](TOb[findMatches[d]][matchField],matchValue[md])) {
                                                 thisMatchArray[thisMatchArray.length] = findMatches[d];
                                                 
                                             }
@@ -510,7 +539,7 @@ TAFFY = function (obj) {
                                     } 
                                     // if the value is not an array but a single value
                                     // If an exact match is found then add it to the array
-                                    else if (findTests[matchType](TAFFYObj[findMatches[d]][matchField],matchValue))
+                                    else if (findTests[matchType](TOb[findMatches[d]][matchField],matchValue))
                                     {
 										thisMatchArray[thisMatchArray.length] = findMatches[d];
                                         
@@ -530,7 +559,7 @@ TAFFY = function (obj) {
     // *
     // * Create public remove method
     // * Purpose: This is used to remove a record from
-    // * the TAFFYObj by an index or an array of indexes.
+    // * the TOb by an index or an array of indexes.
     // *
     // ****************************************
     remove : function (removeIndex) {
@@ -544,26 +573,26 @@ TAFFY = function (obj) {
             for(var di = 0; di < removeIndex.length; di++) {
 				if (this.onRemove != null)
 				{
-					this.onRemove(TAFFYObj[removeIndex[di]]);
+					this.onRemove(TOb[removeIndex[di]]);
 				}
-                TAFFYObj[removeIndex[di]] = 'remove';
+                TOb[removeIndex[di]] = 'remove';
             }
 			
 			// nested function find delete
 			var removeRemaining = function () {
-				for(var tdi = 0; tdi < TAFFYObj.length; tdi++) {
-           		 	if (TAFFYObj[tdi] === 'remove') {
+				for(var tdi = 0; tdi < TOb.length; tdi++) {
+           		 	if (TOb[tdi] === 'remove') {
                     	return t;
              		}
             	}
 				return f;
 			};
             
-            // loop over TAFFYObj and remove all rows set to remove
+            // loop over TOb and remove all rows set to remove
             while (removeRemaining()) {
-				for(var tdi = 0; tdi < TAFFYObj.length; tdi++) {
-	                if (TAFFYObj[tdi] === 'remove') {
-	                    TAFFYObj.splice(tdi,1);
+				for(var tdi = 0; tdi < TOb.length; tdi++) {
+	                if (TOb[tdi] === 'remove') {
+	                    TOb.splice(tdi,1);
 						// update lastModifyDate
 						this.lastModifyDate = new Date();
 	                }
@@ -571,7 +600,7 @@ TAFFY = function (obj) {
 			}
 			
 			// Update Length
-			this.length = TAFFYObj.length;
+			this.length = TOb.length;
             return removeIndex;
     } ,
     
@@ -594,14 +623,14 @@ TAFFY = function (obj) {
 		
 		
         // Do insert
-        TAFFYObj[TAFFYObj.length] = newRecordObj;
+        TOb[TOb.length] = newRecordObj;
 		
 		// update lastModifyDate
 		this.lastModifyDate = new Date();
         
 		// Update Length
-		this.length = TAFFYObj.length;
-		return [TAFFYObj.length-1];
+		this.length = TOb.length;
+		return [TOb.length-1];
     } ,
     
     // ****************************************
@@ -609,7 +638,7 @@ TAFFY = function (obj) {
     // * Create public update method
     // * Purpose: This takes an obj of name/value
     // * pairs and then a set of 1 or more indexes
-    // * and updates those records with in the TAFFYObj
+    // * and updates those records with in the TOb
     // *
     // ****************************************    
     update : function (updateObj,updateIndex) {
@@ -622,11 +651,11 @@ TAFFY = function (obj) {
               
 			  if (this.onUpdate != null)
 				{
-					this.onUpdate(updateObj,TAFFYObj[updateDex]);
+					this.onUpdate(updateObj,TOb[updateDex]);
 				}
 			            
               // Merge Objects
-			  TAFFYObj[updateDex] = TAFFY.mergeObj(TAFFYObj[updateDex],updateObj);
+			  TOb[updateDex] = TAFFY.mergeObj(TOb[updateDex],updateObj);
                         
               // add the updaecount
               updateCount++;
@@ -634,7 +663,7 @@ TAFFY = function (obj) {
               }
         
 			// Update Length
-			this.length = TAFFYObj.length;
+			this.length = TOb.length;
 			return updateIndex;
         } ,
         
@@ -659,8 +688,8 @@ TAFFY = function (obj) {
                 // loop over all of the indexes
                 for(var d = 0; d < getIndex.length; d++) {
                     
-                    // add the TAFFYObj to the newTAFFYArray array
-                    newTAFFYArray[newTAFFYArray.length] = TAFFYObj[getIndex[d]];
+                    // add the TOb to the newTAFFYArray array
+                    newTAFFYArray[newTAFFYArray.length] = TOb[getIndex[d]];
                 }
         return newTAFFYArray;
     },
@@ -680,10 +709,9 @@ TAFFY = function (obj) {
             
          var getIndex = makeIndexArray(getIndex,this.find);
                 
-         return (getIndex.length > 0) ? TAFFYObj[getIndex[0]] : false;
+         return (getIndex.length > 0) ? TOb[getIndex[0]] : false;
 					
     },
-	
 	
 	// ****************************************
     // *
@@ -700,7 +728,7 @@ TAFFY = function (obj) {
         
          var getIndex = makeIndexArray(getIndex,this.find);
                 
-         return (getIndex.length > 0) ? TAFFYObj[getIndex[(getIndex.length - 1)]] : false;
+         return (getIndex.length > 0) ? TOb[getIndex[(getIndex.length - 1)]] : false;
     },
 	
 	// ****************************************
@@ -738,7 +766,7 @@ TAFFY = function (obj) {
         
         // Call JavaScript's array.sort with the custom
         // sort function
-        TAFFYObj.sort(customSort);
+        TOb.sort(customSort);
 		
 		// update lastModifyDate
 		this.lastModifyDate = new Date();
@@ -750,7 +778,7 @@ TAFFY = function (obj) {
     // ****************************************
     // *
     // * Create public forEach method
-    // * Purpose: Loop over every item in a TAFFYObj
+    // * Purpose: Loop over every item in a TOb
     // * (or at least the ones passed in the forIndex)
     // * and call the provided user created function.
     // *
@@ -762,8 +790,8 @@ TAFFY = function (obj) {
         var row;
         // loop over all of the indexes
             for(var fe = 0; fe < forIndex.length; fe++) {
-                // get this row from the TAFFYObj
-                 row = TAFFYObj[forIndex[fe]];
+                // get this row from the TOb
+                 row = TOb[forIndex[fe]];
                 // call the function passed in to the method
 				var nr = func2call(row);
 				
@@ -1009,9 +1037,72 @@ TAFFY = function (obj) {
 	
 	// ****************************************
     // *
+    // * Create public utility getObjectKeys method
+    // * Returns an array of an objects keys
+    // * Purpose: Used to get the keys for an object
+    // *
+    // ****************************************   
+	TAFFY["getObjectKeys"] = function (ob) {
+		var kA = [];
+		for(var n in ob)
+		{
+			if (ob.hasOwnProperty(n))
+			{
+				kA[kA.length] = n;
+			}
+		}
+		kA.sort();
+		return kA;
+	};
+	
+	// ****************************************
+    // *
+    // * Create public utility isSameArray
+    // * Returns an array of an objects keys
+    // * Purpose: Used to get the keys for an object
+    // *
+    // ****************************************   
+	TAFFY["isSameArray"] = function (ar1,ar2) {
+		return (TAFFY.isArray(ar1) && TAFFY.isArray(ar2) && ar1.join(",") == ar2.join(",")) ? true : false;
+	};
+	
+	// ****************************************
+    // *
+    // * Create public utility isSameObject method
+    // * Returns true if objects contain the same
+	// * material or false if they do not
+    // * Purpose: Used to comare objects
+    // *
+    // ****************************************   
+	TAFFY["isSameObject"] = function (ob1,ob2) {
+		if (TAFFY.isObject(ob1) && TAFFY.isObject(ob2)) {		
+		if (TAFFY.isSameArray(TAFFY.getObjectKeys(ob1),TAFFY.getObjectKeys(ob2))) {
+			for(var n in ob1)
+			{
+				if (ob1.hasOwnProperty(n))
+				{
+					if ((TAFFY.isObject(ob1[n]) && TAFFY.isObject(ob2[n]) && TAFFY.isSameObject(ob1[n],ob2[n]))
+						|| (TAFFY.isArray(ob1[n]) && TAFFY.isArray(ob2[n]) && TAFFY.isSameArray(ob1[n],ob2[n]))
+						|| (ob1[n] == ob2[n])) {						
+					} else {
+						return false;
+					}
+				} 
+			}
+		} else {
+			return false;
+		}
+		} else {
+			return false;
+		}
+		return true;
+	};
+	
+	// ****************************************
+    // *
     // * Create public utility gatherUniques method
     // * Return a new array with only unique
-	// * values from the passes array
+	// * values from the passed array
     // * Purpose: Used to get unique indexes for find
     // *
     // ****************************************   
@@ -1057,7 +1148,7 @@ TAFFY = function (obj) {
     // * Purpose: Used to determine if arguments are numbers
     // *
     // ****************************************
-	TAFFY["IsNumeric"] = function (sT) {
+	TAFFY["isNumeric"] = function (sT) {
    		var vC = "0123456789";
    		var IsN=true;
 		for (var i = 0; i < sT.length && IsN == true; i++) 

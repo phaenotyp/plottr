@@ -85,9 +85,7 @@ def date_list(request):
     if request.accepts('application/json'):    
         dates = Date.objects.published()  
         for d in dates:
-            d.absolute_url = d.get_absolute_url() 
-            d.adressdata = d.adress
-            d.locationdata = d.location
+            d.de_normalize() 
         return  HttpResponse(json_encode(dates), mimetype='application/json') 
        
 
@@ -109,9 +107,7 @@ def by_date(request, date):
     dates = Date.objects.by_date(date)  
     if request.accepts('application/json'):    
         for d in dates:
-            d.absolute_url = d.get_absolute_url() 
-            d.adressdata = d.adress
-            d.locationdata = d.location
+            d.de_normalize() 
         return  HttpResponse(json_encode(dates), mimetype='application/json') 
  
 
@@ -148,11 +144,8 @@ def by_place(request, date, country, zipcode=None):
         # denormalization to avoid an abundance of requests.
         # ForeignKey-Fields get serialized only by their id
         # so they are copied to be serialized like a normal object.
-        # TODO: move the denormalization into the model.
         for d in dates:
-            d.absolute_url = d.get_absolute_url()
-            d.adressdata = d.adress
-            d.locationdata = d.location
+            d.de_normalize() 
         return HttpResponse(json_encode(dates), mimetype='application/json')
 
     if request.accepts('text/html'):

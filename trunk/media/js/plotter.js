@@ -135,7 +135,10 @@ var PLTR = {
            // if there was an error in the ajax request, display it.
            PLTR.infobar.error('Ajax-Error! ' + this.url + ' ' + error);
          }
-      }
+      },
+      monthnames : ["Januar", "Februar", "M&auml;rz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+      // the data in the local database is good for half an hour
+      db_expire : 60*(60/2)*1000,
    }, // end of conf
    // functions and variables that deal with the dates themselves
    dates : {
@@ -167,14 +170,80 @@ var PLTR = {
               if(query.zips.join){
                  url += query.zips.join(',');  // a list of zips
               } else {
-                 url += querys.zip; /// a single or partial zip
+                 url += query.zips; /// a single or partial zip
               }
               url += '/';
            }
         }
         return url;
      },
+     _url_query : function(url){ 
+       // takes an url and returns a query object for the same dataset
+       query = {}; 
+       var segments = url.split('/'); 
+       query.date = segments[2]; 
+       if(segments.length >= 4) query.country = segments[3];
+       if(segments.length >= 5) {
+         var zips = segments[4];  
+         if(zips.indexOf(',') != -1){
+            query.zips = zips.split(',');
+         } else {
+            query.zips = zips;
+         }
+         return query; 
+       } 
+     }, 
      db : new TAFFY([]), // the db that contains the local copy of the dates.
+     // dbindex contains the urls that are stored in the database.
+     dbindex : new TAFFY([]), 
+     _get_expire : function(){ 
+       // returns a Date-object of the point that marks the expiration.
+       // dates older than this are expired.
+       var expire = new Date(); 
+       expire.setTime( expire.getTime() - PLTR.conf.db_expire );
+       return expire; 
+     },
+     dbexpire : function(){
+        // delete all the dates that are older than expire. 
+        var deleted = PLTR.dates.db.remove({
+              fetched : {lt:PLTR.dates._get_expire()}}); 
+        PLTR.log(deleted.length+' dates expired in client db.');
+     },
+     check_index : function( url ){ 
+         // takes an url or a query-object  and checks
+         // if it's in the dbindex. meaning that 
+         // it was fetched from the server and the queryset is in the db.
+         // returns false if its not in the index or the index-obejct.
+
+         if( url.date ){ 
+            // in case a query object was passed, get the url for it.
+            url = PLTR.dates._query_url(url); 
+         } 
+         return PLTR.dates.dbindex.first({
+                url:url, 
+                fetched : {gt:PLTR.dates._get_expire()},
+         });
+     }, 
+     local_query : function(query){
+        // return a queryset represented by query from the taffydb
+        // TODO!!
+        var qu={ startdate : { startswith : query.date } };
+        if( query.country ){
+           qu.adressdata = {}; 
+           qu.adressdata.country = query.country;
+           if( query.zips ){
+              if(query.zips.join){
+                // TODO:
+                // this is wrong.  changed in TAFFY 4. look it up.
+                qu.adressdata.zipcode =  query.zips;      
+              } else {
+                qu.adressdata.zipcode = { starts :  query.zips };      
+              }
+           }  
+        } 
+        return qu;
+        //return PLTR.dates.db.get(q); 
+     }, 
      load : function(query, callback){
         // gets a list of dates from the server and fires onDatesLoad event.
         if( PLTR.dates._validate_query(query) ){ // validate the query
@@ -184,12 +253,29 @@ var PLTR = {
            $.ajax({
               url: url,
               success : function( json ){
-                 PLTR.dates.db = new TAFFY([])
+                 // PLTR.dates.db = new TAFFY([]);
+                 // get a timestamp to mark the inserted dates
+                 var timestamp = new Date();
                  // fill PLTR.dates.db with
                  $.each(json, function(index, value){ 
+                    // remove any existing date with the same id
+                    PLTR.dates.db.remove({id:value.id});
+                    // insert the date
+                    value.fetched = timestamp;
                     PLTR.dates.db.insert(value); 
                  });
+                 // save the url in the dbindex
+                 // should here checked for duplicates??
+                 PLTR.dates.dbindex.remove({url:this.url});
+                 PLTR.dates.dbindex.insert({
+                     url : this.url,
+                     fetched : new Date(),
+                 });  
+                 PLTR.log('Added dataset '+this.url+' with '+json.length+' dates.'); 
+                 
                  // trigger an event
+                 // TODO  this should get another parameter
+                 //  PLTR.dates._url_query(this.url); 
                  PLTR.events.trigger('onDatesLoad');
               }
            });
@@ -224,22 +310,26 @@ var PLTR = {
      reload : function( datelist, callback ){  // is reload a keyword?
        // get the listed dates from the server and updates the taffydb.
      },
-     renderone : function(datex, target ){
+     renderone : function(dt, target ){
         // renders one date (json) with the template in
         // PLTR.conf.date_template and appends it to target 
         // if target is not given the selector 'dates_containter'
         // is used instead
         target = target || PLTR.conf.selectors.dates_container;
+        sdate = PLTR.get_js_date(dt.start_datetime); 
+        PLTR.log(dt);
+        PLTR.log(sdate);
         var dateext = { 
+           // TODO:  build startmicroformat 
            startmicroformat : '2008-04-09T08:00:00',
-           startmonth : 'April',
-           startday : '19',
-           startyear : '2008', 
-           location : (datex.locationdata ? datex.locationdata.name : datex.adressdata.street),
+           startmonth : PLTR.conf.monthnames[sdate.getMonth()],
+           startday : sdate.getDate(),
+           startyear : sdate.getFullYear(), 
+           location : (dt.locationdata ? dt.locationdata.name : dt.adressdata.street),
         }; 
-        datex = jQuery.extend(datex, dateext); 
+        dt = jQuery.extend(dt, dateext); 
         // build the url 
-        var rendered = PLTR.template.render(PLTR.conf.date_template, datex); 
+        var rendered = PLTR.template.render(PLTR.conf.date_template, dt); 
         $(target).append(rendered); 
         return rendered;
      },  
@@ -268,6 +358,11 @@ var PLTR = {
      }, 
      init : function(){
         $(PLTR.conf.selectors.dates).click(PLTR.dates._list_click); 
+
+        // schedule the function that handles expiration in
+        // the client database to be executed regulary
+        var expire = window.setInterval( 
+              "PLTR.dates.dbexpire()", PLTR.conf.db_expire);
             
      }, 
    },
@@ -331,9 +426,19 @@ var PLTR = {
       // if the ziplist was changed, it should be automaticly redisplayed.
       PLTR.events.bind('onZiplistChanged', PLTR.navi.display_zips); 
 
-      PLTR.events.bind('onQueryChanged', function(){ 
-          PLTR.log('The Query was changed');
-          PLTR.dates.load(PLTR.navi.get_query()); 
+
+      // when the query was changed, check wether new dates have to 
+      // fetched from the server and do this 
+      // TODO this belogns somewhere else. possibly PLTR.init()
+      PLTR.events.bind('onQueryChanged', function(e, query){ 
+          PLTR.log('The Query was changed.');
+          PLTR.log(query);
+          if(PLTR.dates.check_index(query)){ 
+               PLTR.log('Dataset is already in TaffyDB.');
+              // TODO!! 
+          } else {
+             PLTR.dates.load(query); 
+          }
       }); 
 
       // bind the onlick event for the date-widget
@@ -376,7 +481,7 @@ var PLTR = {
                  $(PLTR.conf.selectors.navi.date_display).html(e.target.title);
                  /* the closing of the widget is done by one-time click event
  *                assigned lower. */
-                 PLTR.events.trigger('onQueryChanged');
+                 PLTR.events.trigger('onQueryChanged', [PLTR.navi.get_query()]);
               } else { 
                  /* prevent further propagation, thus no closing */
                  return false; 
@@ -392,7 +497,7 @@ var PLTR = {
                    $(PLTR.conf.selectors.navi.date_display) 
                        .html(val);  // assign 
                    $('body').trigger('click'); //close widget  
-                   PLTR.events.trigger('onQueryChanged');
+                   PLTR.events.trigger('onQueryChanged', [PLTR.navi.get_query()]);
                 } else { 
                    $(this).addClass(PLTR.conf.css.attention); 
                 }
@@ -416,7 +521,7 @@ var PLTR = {
        });
        $(PLTR.conf.selectors.navi.zips_display)
           .append('<li><span id="addzip">[+]</span></li>');
-       PLTR.events.trigger('onQueryChanged');
+       PLTR.events.trigger('onQueryChanged', [PLTR.navi.get_query()]);
     }, 
     display_country_widget : function(){
     },
@@ -587,9 +692,9 @@ var PLTR = {
          // bind a function to an event 
         $(PLTR.conf.selectors.eventhook).bind(PLTR.events._get(e),f);
       }, 
-      trigger : function( e ){
+      trigger : function( e, params ){
          // triggers an event 
-         $(PLTR.conf.selectors.eventhook).trigger(PLTR.events._get(e));
+         $(PLTR.conf.selectors.eventhook).trigger(PLTR.events._get(e), params);
       }, 
    },
    // makes a copy of an object
@@ -607,9 +712,31 @@ var PLTR = {
        // returns true if the passed object is an array
        return (obj.constructor.toString().indexOf("Array") != -1); 
    },
+   get_js_date : function(dtstr){
+     // takes a string like  yyyy-mm-dd hh:ii:ss and return a js-date-obj
+     var dt = dtstr.split(' '); 
+     var d = dt[0].split('-').concat(dt[1].split(':'));
+     //while(dd.length){ d.push(parseInt(dd.shift()));}; 
+                           ///  V  Date likes the months zero-based.
+     return new Date( d[0], d[1]-1, d[2], d[3], d[4], d[5] ); 
+   },
+   multisplit : function( str, splitters ){
+      // this should take an a string and an array of split-characters
+      // or strings and split up the string by any of them.
+      // but it don't
+      res = [str];
+      for( var i=splitters.length-1; i>=0; i--){
+         for( var c=0; c<res.length; c++){
+            // this won't work, cause the last arguments 
+            // to splice can't be an array.
+            // how awkward
+            res.splice(c,1,res[c].split(splitters[i]));
+         }
+      }
+             
+   },
    // initialises Plotter.
    init : function(){
-
       // body gets the class dynamic.
       // all css-changes for stepwise enhancement of the site 
       // should be hooked to that class.
@@ -632,11 +759,10 @@ var PLTR = {
       jQuery.ajaxSetup(PLTR.conf.jquery_ajax_defaults);
 
       // bind events
-      PLTR.events.bind('onDatesLoad', function(){ PLTR.dates.render(); });
+      PLTR.events.bind('onDatesLoad', function(e,query){ PLTR.dates.render(); });
       PLTR.events.bind('onDatesLoad', function(){ PLTR.log('New Dates have been loaded.');});
 
    }
 };  // end of PLTR;
-
 
 $(PLTR.init); 
