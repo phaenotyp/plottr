@@ -9,10 +9,30 @@
  <body>
   <script language="javascript">
 
+/*
+    function testDBIndex(){
+       var query = { country : 'de', zips : '53111', date : '2008-11-21' };
+       var url = PLTR.dates._query_url(query);
+       PLTR.dates.load(query); 
+       // fetch an element by id 10000 times. that should give the server time
+       // to return the queryset. 
+       for( var i=0; i<500000; i++){
+          document.getElementById('infobar');
+       }  
+       //assertTrue('Should return an object',  PLTR.dates.check_index(url));
+       assertEquals(url,PLTR.dates.check_index(url).url);
+
+    }
+*/
+    function testLocalQuery(){
+       fail();
+    } 
+
+
     function testQueryValidation(){
         // tests if validation of a query-object with _validate_query works
         // test correct
-        query = {country : 'de', zip : '53111', date : '2008-11-21'};
+        var query = {country : 'de', zip : '53111', date : '2008-11-21'};
         assertTrue('Correct Query', PLTR.dates._validate_query(query));
 
         query.zip = '50';
@@ -25,12 +45,10 @@
         assertFalse('Defect Date', PLTR.dates._validate_query(query));
 
         query.date = '2008-12-12';
-        query.zip = 'derm' 
+        query.zip = 'derm';
         assertFalse('Defect Zip', PLTR.dates._validate_query(query));
-        query.zip = [] 
+        query.zip = [];
         assertFalse('Defect Zip - empty array', PLTR.dates._validate_query(query));
-
-
 
         //TODO
         // testcase is incomplete. other defect queries should be tested
@@ -38,14 +56,27 @@
 
     function testUrlBuildingFromQuery(){
         // tests if construction of a url from a query object works
-        query = { country : 'de', zip : '53111', date : '2008-11-21' };
-        url = PLTR.dates._query_url(query);
+        var query = { country : 'de', zips : '53111', date : '2008-11-21' };
+        var url = PLTR.dates._query_url(query);
         assertEquals('/dates/2008-11-21/de/53111/', url);
 
-        query = { country : 'de', zip : [53111, 50672], date : '2008' };
+        query = { country : 'de', zips : [53111, 50672], date : '2008' };
         url = PLTR.dates._query_url(query);
         assertEquals('/dates/2008/de/53111,50672/', url);
+    }
 
+    function testQueryBuildingFromURL(){
+       var url = '/dates/2008-11-21/de/53111/';
+       var query = { country : 'de', zips : '53111', date : '2008-11-21' };
+       var testquery = PLTR.dates._url_query(url); 
+       var desc = 'should be: date : '+query.date+', zips : '+query.zips ;
+       desc += 'was: date : '+testquery.date+', zips : '+testquery.zips ;
+       assertObjectEquals(desc, query, testquery );
+
+       url = '/dates/2008/de/53111,50672/';
+       query = { country : 'de', zips : [53111, 50672], date : '2008' };
+       var testquery = PLTR.dates._url_query(url); 
+       assertObjectEquals(query, testquery);
     }
 
     function testIsArray(){
@@ -61,9 +92,17 @@
        assertFalse(PLTR.isArray(na3));
     } 
 
+    function testGet_js_date(){
+        var str = '2008-04-22 20:15:00';
+        var dt = PLTR.get_js_date(str); 
+        assertEquals(dt.getDate(), 22); 
+        assertEquals(dt.getFullYear(), 2008); 
+    } 
+
     function testRenderone(){
         PLTR.conf.date_template = 'My name is {{ name }}.';
-        var context = { name : 'Harold' }; 
+        var context = { name : 'Harold', adressdata : { street:'sesame'}  }; 
+        context.start_datetime =  '2008-04-22 20:15:00';
         PLTR.dates.renderone(context, '#secondary');   
         assertEquals('My name is Harold.', $('#secondary').text());
         
@@ -86,7 +125,7 @@
 
     function testClone(){ 
       // test the function PLTR.clone
-      var obj1 = { prop : '1'  };
+      var obj1 = { prop : '1' };
       var ref1 = obj1;
       assertEquals( 'referens == original', obj1, ref1 );  
       ref1.prop = 2;

@@ -153,15 +153,17 @@ class Date(models.Model):
 
     def has_map(self): 
         """Returns True if date has an adress""" 
+        # check for an adress
         if not self.adress:
-            if self.location:
-                self.save() 
+            if self.location: # if there's no adress, but a location
+                self.save()   # saving fills the  adress
             else:
                 return False
 
         if not self.adress: 
             return False
-  
+ 
+        # try to geocode the adress if no lat/long-pair is there. 
         if (not self.adress.lat) or (not self.adress.long):
             self.adress.geocode() 
 
@@ -173,19 +175,19 @@ class Date(models.Model):
     def get_static_map(self): 
         """Returns a url to a picture with a map showing the location of the date."""
         if not self.has_map():
-            return settings.NO_STATIC_MAP
+            return settings.NO_STATIC_MAP # returns url to a standart picture.
 
         params = { 
            'lat': self.adress.lat, 
            'long': self.adress.long, 
            'markers': [ { 'lat': self.adress.lat, 'long':self.adress.long  } ],
         } 
-       
         return static_map(params)
 
     def __str__(self):
         return '%s - %s' % (self.startdate.strftime('%d.%m.%Y'), self.summary) 
 
+    # should be removed
     def _get_absolute_url(self):
         "returns the unique url to this date"
         return ('single_by_id', (), {
@@ -206,6 +208,17 @@ class Date(models.Model):
         "Returns a datetime object for the start-date and time of the date" 
         return datetime.combine(self.startdate, self.starttime) 
 
+    def de_normalize(self):
+        """to deliver more information on a single request,
+           de-normalize the object. 
+           mainly for use with json."""
+        # TODO: check if de-normalization is somehow saved by
+        # self.save()  that would be bad.
+        self.adressdata = self.adress     
+        self.locationdata = self.location   
+        self.absolute_url = self.get_absolute_url() 
+        self.start_datetime = self.startdatetime()
+
     def as_json(self):
         """returns a json-representation of the date"""
         # changes to the json output should be documented in:
@@ -213,9 +226,7 @@ class Date(models.Model):
         from plotter.utils import json_encode
         # the joined models are de-normalized into the the date-model
         # in order to cut down on ajax requests.
-        self.adressdata = self.adress     
-        self.locationdata = self.location   
-        self.absolute_url = self.get_absolute_url() 
+        self.de_normalize(); 
         json = json_encode(self) 
         return json
 
