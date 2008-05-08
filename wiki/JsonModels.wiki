@@ -1,9 +1,11 @@
-#summary The Json Models mainly used for XHR communicaton
+﻿#summary The Json Models mainly used for XHR communicaton
 #labels Phase-Design,Phase-Implementation
 
 = JSON Output  =
 
 == Model for Date == 
+
+*More de-normalizations have been added, so this document is not up-to-date*
 
 Its a little redundant and doesn't contain de-normalization for organizer. 
 This is gererated in [http://code.google.com/p/plottr/source/browse/trunk/apps/dates/models.py apps.dates.models]. Changes made there should be reflected here. 

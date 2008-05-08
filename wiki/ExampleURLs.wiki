@@ -1,5 +1,16 @@
-﻿#summary URLs exposed by the Plotter-Webservice.
+﻿﻿#summary URLs exposed by the Plotter-Webservice.
 #labels Phase-Design
+
+= URL Scheme =
+
+Plotter uses a simple url-scheme to allow requests for date-information.
+
+{{{/dates/{date}/{country}/{zip[s]}/}}}
+
+{_date_}  is a date in the format _yyyy-mm-dd_ (month and day being optional) or a string 'today', 'tomorrow', etc:
+{country} is a two-character countrycode.
+{zip} is either one full or partial zipcode or a list of full zipcodes seperated by commas.
+
 
 = Example URLs =
 
