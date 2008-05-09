@@ -214,7 +214,18 @@ class Date(models.Model):
            mainly for use with json."""
         # TODO: check if de-normalization is somehow saved by
         # self.save()  that would be bad.
-        self.adressdata = self.adress     
+        
+        #self.adressdata = self.adress     
+        # the adress is denormalized directly to the date object
+        # because at the time writing TaffyDB doesn't support querying
+        # on sub-objects. 
+        self.city = self.adress.city
+        self.zipcode = self.adress.zipcode
+        self.street = self.adress.street
+        self.country = self.adress.country
+        self.lat = self.adress.lat
+        self.long = self.adress.long
+
         self.locationdata = self.location   
         self.absolute_url = self.get_absolute_url() 
         self.start_datetime = self.startdatetime()
