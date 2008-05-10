@@ -1,4 +1,4 @@
-﻿﻿#summary A short guide on how to install a development version.
+﻿﻿﻿#summary A short guide on how to install a development version.
 #labels Phase-Implementation,Featured
 
 =Getting Started=
@@ -13,7 +13,7 @@ Assuming you got a version of Python >2.3 and an install of sqlite you just need
 
 ===Get Django===
 
-Django installation shold go in a direcory below you python site-packages direcory. The easiest way to find this is to execute 
+Django installation should go in a direcory below you python site-packages direcory. The easiest way to find this is to execute 
 
 {{{ python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" }}}
 on the commandline.
@@ -26,6 +26,8 @@ and
 ===Get Plotter===
 
 Get the trunk version of plotter.
+
+cd into the directory in which you want to keep Django-Projects.
 
 {{{ svn checkout http://plottr.googlecode.com/svn/trunk/ plotter }}}
 
