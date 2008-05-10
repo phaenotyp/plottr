@@ -75,7 +75,7 @@ var PLTR = {
       // misc
       // default values for querying dates from the server.
       default_query : {
-         startdate : 'today', country : 'de'
+         startdate : 'all', country : 'de'
       },
       query_validation : {
          // query validation contains functions to validate members of a query object.
@@ -103,7 +103,7 @@ var PLTR = {
             // so far only german zip-code (postleitzahlen) are valid.
             // either a list of zip or a single posibly partial zip are 
             // valid
-           if( PLTR.isArray(subject)){
+           if( TAFFY.isArray(subject)){
                if(subject.length == 0) return false; 
                for(var i=subject.length-1; i>=0; i-- ){
                   if( !new RegExp('^\\d{1,5}$').test(subject[i]) ){ 
@@ -131,8 +131,8 @@ var PLTR = {
        <span class="year">{{ startyear }}</span>\
     </div>\
     <div>\
-      <a class="location">{{ location }}<a/>\
-      <a class="summary url" href="{{ absolute_url }}">{{ summary }}</a>\
+      <a class="location">{{ location }}, {{ city }}<a/>\
+      <a class="summary url">{{ summary }}</a>\
     </div>\
     <span class="clear"></span>\
   </li>',
@@ -158,7 +158,8 @@ var PLTR = {
         // and validate a same named member of the query with them.
         for( attr in PLTR.conf.query_validation ){
            if( $.isFunction( PLTR.conf.query_validation[attr] ) && query[attr]){
-              // this should call the method attr of query_validation and pass it the member of query by the same same
+              // call the method attr of query_validation and
+              // pass it the member of query by the same same
               if(!PLTR.conf.query_validation[attr](query[attr])) return false;
            }
         }
@@ -172,14 +173,16 @@ var PLTR = {
         query = jQuery.extend(new PLTR.clone(PLTR.conf.default_query), query); 
         // build the url 
         var url = '/dates/';
-        if( query.startdate){  // startdate
+        if(query.startdate){  // startdate
            if ( query.startdate.starts || query.startdate.startswith ){ 
                 var sd = query.startdate.starts || query.startdate.startswith; 
                 url += sd + '/'; 
            } else { 
                 url += query.startdate + '/'; 
            }  
-        }
+        } else {
+           url += 'all/'; 
+        }  
         if(query.country){                     // country
            url += query.country + '/';
            if(query.zipcode){                 // zip is only possible with country 
@@ -205,7 +208,9 @@ var PLTR = {
        // extract the date.
        // should this take care if the date is a string like 'all'
        // and not use starts?
-       query.startdate = { starts :  segments[2] }; 
+       if(segments[2] != 'all'){
+          query.startdate = { starts :  segments[2] }; 
+       }
        if(segments.length >= 4) query.country = segments[3];
        if(segments.length >= 5) {
          var zips = segments[4];  
@@ -240,7 +245,7 @@ var PLTR = {
          // returns false if its not in the index or the index-obejct.
          
 
-         if( url.startdate ){ 
+         if( TAFFY.isObject(url) ){ 
             // in case a query object was passed, get the url for it.
             url = PLTR.dates._query_url(url); 
          } 
@@ -248,23 +253,6 @@ var PLTR = {
                 url:url, 
                 fetched : {gt:PLTR.dates._get_expire()},
          });
-     }, 
-     __local_query : function(query){
-        // return a queryset represented by query from the taffydb
-        // TODO!!
-        var qu={ startdate : { startswith : query.date } };
-        if( query.country ){
-           qu.country = query.country;
-           if( query.zips ){
-              if(query.zips.join){
-                qu.zipcode = query.zips;      
-              } else {
-                qu.zipcode = { starts : query.zips };      
-              }
-           }  
-        } 
-        //return qu;
-        return PLTR.dates.db.get(q); 
      }, 
      load : function(query, callback){
         // gets a list of dates from the server and fires onDatesLoad event.
@@ -296,8 +284,6 @@ var PLTR = {
                  PLTR.log('Added dataset '+this.url+' with '+json.length+' dates.'); 
                  
                  // trigger an event
-                 // TODO  this should get another parameter
-                 //  PLTR.dates._url_query(this.url); 
                  PLTR.events.trigger('onDatesLoad', [PLTR.dates._url_query(this.url)]);
               }
            });
@@ -338,19 +324,20 @@ var PLTR = {
         // if target is not given the selector 'dates_containter'
         // is used instead
         target = target || PLTR.conf.selectors.dates_container;
+        // processing the context for the template:
         sdate = PLTR.get_js_date(dt.start_datetime); 
         PLTR.log(dt);
         PLTR.log(sdate);
         var dateext = { 
            // TODO:  build startmicroformat 
-           startmicroformat : '2008-04-09T08:00:00',
+           startmicroformat : sdate.toGMTString(),// '2008-04-09T08:00:00',
            startmonth : PLTR.conf.monthnames[sdate.getMonth()],
            startday : sdate.getDate(),
            startyear : sdate.getFullYear(), 
            location : (dt.locationdata ? dt.locationdata.name : dt.street),
         }; 
         dt = jQuery.extend(dt, dateext); 
-        // build the url 
+        // rendering the date with the context
         var rendered = PLTR.template.render(PLTR.conf.date_template, dt); 
         $(target).append(rendered); 
         return rendered;
@@ -365,7 +352,10 @@ var PLTR = {
        for(var i=0, max=obj.length; i<max; i++){
           PLTR.dates.renderone(obj[i], target);
        }
+       // now, all the dates are in the dom. 
+       // add additional classnames. 
        $(PLTR.conf.selectors.dates+':odd').addClass('odd'); 
+       // add events
        $(PLTR.conf.selectors.dates).click(PLTR.dates._list_click); 
           
      },
@@ -391,11 +381,6 @@ var PLTR = {
    header : { 
     // behaviour of the header. mainly the navigation in the header.
     init : function(){ 
-       // hide the content of the header navi   
-       // TODO: should be changed to use class dynamic in css
-      // $(PLTR.conf.selectors.header_navi_items)
-      //   .hide();
-       
        // show single items on mouse-over
        $(PLTR.conf.selectors.header_navi).bind('mouseenter', function(){
            $(PLTR.conf.selectors.header_navi_items).hide();
@@ -406,7 +391,6 @@ var PLTR = {
    },
    navi : {
     // the navigation-bar or 'query-editor' 
-    //query_items : ['date','country','zips'],  // TODO delete me
     zips : [ 53111, 50667 ],
     init : function(){
       // add methods to the ziplist.
@@ -449,19 +433,6 @@ var PLTR = {
       PLTR.events.bind('onZiplistChanged', PLTR.navi.display_zips); 
 
 
-      // when the query was changed, check wether new dates have to 
-      // fetched from the server and do this 
-      // TODO this belogns somewhere else. possibly PLTR.init()
-      PLTR.events.bind('onQueryChanged', function(e, query){ 
-          PLTR.log('The Query was changed.');
-          PLTR.log(query);
-          if(PLTR.dates.check_index(query)){ 
-               PLTR.log('Dataset is already in TaffyDB.');
-               PLTR.dates.render(PLTR.dates.db.get(query)); 
-          } else {
-             PLTR.dates.load(query); 
-          }
-      }); 
 
       // bind the onlick event for the date-widget
       $(PLTR.conf.selectors.navi.date_display)
@@ -487,8 +458,18 @@ var PLTR = {
        // returns a query object based on the current selection 
        // in the query editor.
        var query = {}; 
-       query.startdate =
-          {starts : $(PLTR.conf.selectors.navi.date_display).html()};
+       var sd = $(PLTR.conf.selectors.navi.date_display).html();
+       if(sd != 'all'){  
+          if(sd=='today'){ 
+            var d = new Date();
+            sd = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+          } else if( sd=='tomorrow'){ 
+            var d = new Date();
+            d.setTime(  d.getTime() + (60*60*24*1000));
+            sd = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+          }  
+          query.startdate =  {starts : sd };
+       }  
        query.country = 'de';
        if( PLTR.navi.zips.length == 1){ 
            query.zipcode = {starts:PLTR.navi.zips[0]};
@@ -737,6 +718,7 @@ var PLTR = {
    },
    isArray : function(obj){
        // returns true if the passed object is an array
+       return TAFFY.isArray(obj);
        return (obj.constructor.toString().indexOf("Array") != -1); 
    },
    get_js_date : function(dtstr){
@@ -786,10 +768,31 @@ var PLTR = {
       jQuery.ajaxSetup(PLTR.conf.jquery_ajax_defaults);
 
       // bind events
+      // when the query was changed in the query-editor,
+      //  check in the index wether new dates have to be
+      // fetched from the server and do this 
+      // if the dates are already in PLTR.dates.db just
+      // render the queryset. 
+      PLTR.events.bind('onQueryChanged', function(e, query){ 
+          PLTR.log('The Query was changed.');
+          PLTR.log(query);
+          if(PLTR.dates.check_index(query)){ 
+               PLTR.log('Dataset '+PLTR.dates._query_url(query)+' is already in TaffyDB.');
+               PLTR.dates.render(PLTR.dates.db.get(query)); 
+          } else {
+             PLTR.dates.load(query); 
+          }
+      }); 
+      // when dates are loaded from the server they get stored in
+      // PLTR.dates.db before onDatesLoad is called
+      // so just rendering the queryset is left to do.
       PLTR.events.bind('onDatesLoad', function(e,query){
          PLTR.dates.render( PLTR.dates.db.get(query));
       });
+      // logging.
       PLTR.events.bind('onDatesLoad', function(){ PLTR.log('New Dates have been loaded.');});
+
+
 
    }
 };  // end of PLTR;
