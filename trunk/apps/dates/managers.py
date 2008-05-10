@@ -17,7 +17,7 @@ class DateManager(models.Manager):
 
     def today(self):
         """returns a queryset of all published dates today"""
-        return self.oneday(datetime.datetime.today())
+        return self.oneday(datetime.today())
 
 
     # umaintained and depreciated

@@ -24,30 +24,29 @@
 
     }
 */
-    function testLocalQuery(){
-       fail();
-    } 
-
 
     function testQueryValidation(){
         // tests if validation of a query-object with _validate_query works
         // test correct
-        var query = {country : 'de', zip : '53111', date : '2008-11-21'};
+        var query = {country : 'de', zipcode : '53111', startdate : '2008-11-21'};
         assertTrue('Correct Query', PLTR.dates._validate_query(query));
 
-        query.zip = '50';
-        assertTrue('Correct Query - short zip', PLTR.dates._validate_query(query));
-        query.zip = [12345,54321];
+        query.zipcode = '50';
+        assertTrue('Correct Query - short zip 1', PLTR.dates._validate_query(query));
+        query.zipcode = {starts:'50'};
+        assertTrue('Correct Query - short zip 2', PLTR.dates._validate_query(query));
+ 
+        query.zipcode = [12345,54321];
         assertTrue('Correct Query - zip-array', PLTR.dates._validate_query(query));
  
         // test wrong
-        query.date = 'derm';
+        query.startdate = 'derm';
         assertFalse('Defect Date', PLTR.dates._validate_query(query));
 
-        query.date = '2008-12-12';
-        query.zip = 'derm';
+        query.startdate = '2008-12-12';
+        query.zipcode = 'derm';
         assertFalse('Defect Zip', PLTR.dates._validate_query(query));
-        query.zip = [];
+        query.zipcode = [];
         assertFalse('Defect Zip - empty array', PLTR.dates._validate_query(query));
 
         //TODO
@@ -56,25 +55,25 @@
 
     function testUrlBuildingFromQuery(){
         // tests if construction of a url from a query object works
-        var query = { country : 'de', zips : '53111', date : '2008-11-21' };
+        var query = { country : 'de', zipcode : '53111', startdate : '2008-11-21' };
         var url = PLTR.dates._query_url(query);
         assertEquals('/dates/2008-11-21/de/53111/', url);
 
-        query = { country : 'de', zips : [53111, 50672], date : '2008' };
+        query = { country : 'de', zipcode : [53111, 50672], startdate :{starts: '2008'} };
         url = PLTR.dates._query_url(query);
         assertEquals('/dates/2008/de/53111,50672/', url);
     }
 
     function testQueryBuildingFromURL(){
        var url = '/dates/2008-11-21/de/53111/';
-       var query = { country : 'de', zips : '53111', date : '2008-11-21' };
+       var query = { country : 'de', zipcode : {starts: '53111'}, startdate :{starts:'2008-11-21'} };
        var testquery = PLTR.dates._url_query(url); 
-       var desc = 'should be: date : '+query.date+', zips : '+query.zips ;
-       desc += 'was: date : '+testquery.date+', zips : '+testquery.zips ;
+       var desc = 'should be: date : '+query.startdate+', zips : '+query.zipcode ;
+       desc += 'was: date : '+testquery.startdate+', zips : '+testquery.zipcode ;
        assertObjectEquals(desc, query, testquery );
 
        url = '/dates/2008/de/53111,50672/';
-       query = { country : 'de', zips : [53111, 50672], date : '2008' };
+       query = { country : 'de', zipcode : [53111, 50672], startdate:{starts:'2008'} };
        var testquery = PLTR.dates._url_query(url); 
        assertObjectEquals(query, testquery);
     }
