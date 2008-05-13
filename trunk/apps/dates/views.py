@@ -112,6 +112,7 @@ def by_date(request, date):
  
 
     if request.accepts('text/html'):
+        print 'by date as html' 
         # using the generic view with custom parameters
         return object_list(   
            request,
@@ -123,9 +124,8 @@ def by_date(request, date):
 
 def by_place(request, date, country, zipcode=None):
     """ a list of dates, matching the parameter date and place
-        /dates/2009-12-23/de-52123/
+        /dates/2009-12-23/de/52123/
     """
-
     # get dates by dates and country
     dates = Date.objects.by_date(date).filter(adress__country__iexact=country)
     # filter the queryset by zipcode
@@ -147,7 +147,7 @@ def by_place(request, date, country, zipcode=None):
         for d in dates:
             d.de_normalize() 
         return HttpResponse(json_encode(dates), mimetype='application/json')
-
+    
     if request.accepts('text/html'):
         # using the generic view with custom parameters
         return object_list(

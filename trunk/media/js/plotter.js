@@ -282,9 +282,9 @@ var PLTR = {
                      fetched : new Date(),
                  });  
                  PLTR.log('Added dataset '+this.url+' with '+json.length+' dates.'); 
-                 
+                
                  // trigger an event
-                 PLTR.events.trigger('onDatesLoad', [PLTR.dates._url_query(this.url)]);
+                 PLTR.events.trigger('onDatesLoad', [query]);
               }
            });
         } else { // query object was invalid.
@@ -326,8 +326,6 @@ var PLTR = {
         target = target || PLTR.conf.selectors.dates_container;
         // processing the context for the template:
         sdate = PLTR.get_js_date(dt.start_datetime); 
-        PLTR.log(dt);
-        PLTR.log(sdate);
         var dateext = { 
            // TODO:  build startmicroformat 
            startmicroformat : sdate.toGMTString(),// '2008-04-09T08:00:00',
@@ -462,13 +460,13 @@ var PLTR = {
        if(sd != 'all'){  
           if(sd=='today'){ 
             var d = new Date();
-            sd = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+            sd = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
           } else if( sd=='tomorrow'){ 
             var d = new Date();
             d.setTime(  d.getTime() + (60*60*24*1000));
-            sd = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+            sd = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
           }  
-          query.startdate =  {starts : sd };
+          query.startdate = {starts : sd};
        }  
        query.country = 'de';
        if( PLTR.navi.zips.length == 1){ 
@@ -489,6 +487,7 @@ var PLTR = {
                  $(PLTR.conf.selectors.navi.date_display).html(e.target.title);
                  /* the closing of the widget is done by one-time click event
  *                assigned lower. */
+                 PLTR.log('datewidget - trigger - click'); 
                  PLTR.events.trigger('onQueryChanged', [PLTR.navi.get_query()]);
               } else { 
                  /* prevent further propagation, thus no closing */
@@ -498,13 +497,15 @@ var PLTR = {
            .find('input')  // deal with the input for dates  
            .removeClass(PLTR.conf.css.attention) 
            .keypress( function(e){
-             if(e.keyCode==27){ $('body').trigger('click');  } // esc
+             if(e.keyCode==27){ $('body').trigger('click');  } // escape
              else if(e.keyCode==13){  // if return is pressed...
                var val =  $(this)[0].value; // get the input..
                if( PLTR.conf.query_validation.startdate(val)){ // validate..
                    $(PLTR.conf.selectors.navi.date_display) 
                        .html(val);  // assign 
                    $('body').trigger('click'); //close widget  
+
+                   PLTR.log('datewidget - trigger - keypress'); 
                    PLTR.events.trigger('onQueryChanged', [PLTR.navi.get_query()]);
                 } else { 
                    $(this).addClass(PLTR.conf.css.attention); 
@@ -596,6 +597,17 @@ var PLTR = {
    }, 
   // behaviour of the sidebar
    sidebar : {
+      init : function(){ 
+          PLTR.events.bind('onQueryChanged', function(e, query){ 
+             if( query.startdate ){ 
+                sd = query.startdate.starts || query.startdate; 
+                var segm = sd.split('-'); 
+                if(segm.length == 1) PLTR.log('Whole year '+segm[0]+' requested'); 
+                if(segm.length == 2) PLTR.log( segm[1]+' '+segm[0]+' requested'); 
+                if(segm.length == 3) PLTR.log('Specific date requested'); 
+             }  
+          });
+      },
       hide : function(){
       },
       show : function(){
@@ -764,10 +776,12 @@ var PLTR = {
          }
       }
 
-      // assign sesible defaults to all ajax-calls.
+      // assign sensible defaults to all ajax-calls.
       jQuery.ajaxSetup(PLTR.conf.jquery_ajax_defaults);
 
-      // bind events
+      // bind events -> see wiki for more information 
+      // - more event-bindings may be in other init-fuctions when apropiate
+      
       // when the query was changed in the query-editor,
       //  check in the index wether new dates have to be
       // fetched from the server and do this 
@@ -787,10 +801,10 @@ var PLTR = {
       // PLTR.dates.db before onDatesLoad is called
       // so just rendering the queryset is left to do.
       PLTR.events.bind('onDatesLoad', function(e,query){
-         PLTR.dates.render( PLTR.dates.db.get(query));
+         PLTR.dates.render(PLTR.dates.db.get(query));
       });
       // logging.
-      PLTR.events.bind('onDatesLoad', function(){ PLTR.log('New Dates have been loaded.');});
+      //PLTR.events.bind('onDatesLoad', function(){ PLTR.log('New Dates have been loaded.');});
 
 
 
