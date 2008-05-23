@@ -9,6 +9,9 @@ urlpatterns = patterns('plotter.apps.dates.views',
     # redirect takes date, country and zip as get-parameters 
     # and redirects to the according url
     (r'redirect/', 'redirect' ), 
+
+    # displays a input form for new dates.
+    (r'new/', 'newdate' ), 
   
     # dates filtered by date and country
     # plottr.de/dates/2008-07/de/
