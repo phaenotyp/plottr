@@ -30,6 +30,13 @@ class Organizer(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(prepopulate_from=('name', ))
 
+#    description = models.TextField(blank=True)
+
+    # contact data 
+#    phone = models.CharField(max_length=30, blank=True) 
+#    email = models.EmailField(blank=True);
+#    web = models.URLField(blank=True); 
+
     #webresources = models.ManyToManyField(Webresource)
     
     def __str__(self):
@@ -81,10 +88,14 @@ class Adress(models.Model):
 class Location(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(prepopulate_from=('name',))
-    
+   
+    # contactdata  
     contactmail = models.EmailField(blank=True)
+    # url = models.URLField(blank=True) 
     
-    adress = models.ForeignKey('Adress', blank=True, null=True, unique=True) # should be one-to-one 
+
+    # should be one-to-one 
+    adress = models.ForeignKey('Adress', blank=True, null=True, unique=True) 
     icon = models.ImageField(blank=True, null=True, upload_to='/locations/') 
 
     # from the future: 

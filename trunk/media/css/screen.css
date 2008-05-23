@@ -174,8 +174,8 @@ body.dynamic ul#headnavi>li {
 }
 body.dynamic .headnavi_items {
    position:absolute;
-   top:0;
-   left:-7em; 
+   top:0.9em;
+   left:-12em; 
    width:12em;
    text-align:left;
    display:none;
@@ -199,9 +199,64 @@ body {
 }
 
 div#container {
-  background: #EEE;
+  background: #FFF;
 }
 
+/* header ----------------- */
+
+#logocontainer>h1{
+   text-indent:-1337px;
+   background: url(../gfx/plotter_title.png) no-repeat; ;
+   width:450px;
+   height:170px;
+   z-index:12;
+}
+
+#header{
+ background : #FFF;
+}
+
+#headnavi {
+   z-index:2;
+} 
+
+#headnavi h3  {
+   z-index:12; 
+   position:relative;
+  text-indent:1337px;
+  height:33px;
+}
+
+.headnavi_items{ 
+  height:116px;
+  min-width:250px;
+  background: url(../gfx/plotter_headnavi_bg.png); 
+  padding:10px;
+  padding-right:4em;
+  z-index:1; 
+  
+}
+
+#headnavi li#about h3{ 
+  background: url(../gfx/plotter_headnavi.png) ;  
+} 
+
+#headnavi li#participate h3{ 
+  background: url(../gfx/plotter_headnavi.png) 0px -30px;;  
+}
+
+#headnavi li#login h3{ 
+  background: url(../gfx/plotter_headnavi.png) 0px -66px;;  
+}
+/* footer ---------------- */ 
+
+#footer {
+  height : 200px;
+  background: #dfb521 url(../gfx/plotter_footer_right.png) bottom right no-repeat;
+}
+
+
+/* infobar ----------------- */
 div#infobar {
   background: #666;
   padding: 0.3em;
@@ -275,6 +330,8 @@ ul#dates a.summary {
 
 ul#dates div.dtstart {
    border:1px solid black;
+   -moz-border-radius: 5px;
+   -webkit-border-radius: 5px;
 }
 
 /* date-list selected item  */
@@ -295,7 +352,8 @@ ul#dates>li.selected div.dtstart {
 
 /* boxes in the secondary */
 div.box {
-   background : #dedede;
+   background : url(../gfx/plotter_box_bg.png ) #dedede;
+   
 }
 
 div.box>h2 {

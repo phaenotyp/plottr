@@ -158,6 +158,14 @@ def by_place(request, date, country, zipcode=None):
            extra_context ={'queryfallbackform': QueryFallbackForm({'date': date, 'country': country, 'zips': zipcode})},
         )
 
+
+def newdate(request): 
+    """Create new Dates"""
+    from apps.dates.forms import ComboForm 
+    form = ComboForm() 
+    return render_to_response('dates/dateform.html', {'form': form}  )
+
+
 def by_geo(request, date, geo, distance):
     """Dates filtered by geocoordinates
        /dates/today/50.94918,6.98533/walking/
