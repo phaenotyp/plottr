@@ -79,6 +79,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'plotter.apps.dates',
+    'plotter.apps.locations',
 )
 
 # url to the image indicating that there is no static map available 
