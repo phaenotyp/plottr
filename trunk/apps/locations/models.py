@@ -26,6 +26,7 @@ class Adress(models.Model):
 
     def get_json(self):
        """returns the adress as a json-object"""
+       pass
 
 
     def __str__(self):
