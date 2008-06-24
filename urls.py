@@ -7,6 +7,12 @@ urlpatterns = patterns('',
     (r'^dates/', include('plotter.apps.dates.urls')),
 )
 
+# patterns for locations
+urlpatterns += patterns('',
+    # the url of the dates application are managed by itself
+    (r'^locations/', include('plotter.apps.locations.urls')),
+)
+
 # patterns for events 
 urlpatternsss = patterns('',
     # an overview of events per year
